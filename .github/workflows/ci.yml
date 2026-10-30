@@ -1,0 +1,29 @@
+name: Storefront CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, develop]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      HAS_BACKEND: ${{ secrets.MEDUSA_BACKEND_URL != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # The build pre-renders pages from the API, so it needs a reachable backend.
+      # Add these as repository secrets once staging is up (Khalifa).
+      - name: Build
+        if: env.HAS_BACKEND == 'true'
+        env:
+          MEDUSA_BACKEND_URL: ${{ secrets.MEDUSA_BACKEND_URL }}
+          NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${{ secrets.MEDUSA_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_BASE_URL: http://localhost:8000
+          NEXT_PUBLIC_DEFAULT_REGION: ng
+        run: npm run build
