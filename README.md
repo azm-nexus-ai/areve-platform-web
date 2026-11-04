@@ -26,6 +26,15 @@ npm install
 npm run dev                   # http://localhost:8000
 ```
 
+## Deploy on Vercel
+
+1. Vercel → Add New Project → import `azm-nexus-ai/areve-platform-web` (framework: Next.js, defaults are fine).
+2. Environment variables: `MEDUSA_BACKEND_URL` (the Railway API URL), `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`, `NEXT_PUBLIC_BASE_URL` (the Vercel URL), `NEXT_PUBLIC_DEFAULT_REGION=ng`, `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY`, `REVALIDATE_SECRET`.
+3. Add the Vercel URL to the API's `STORE_CORS`, and set the Paystack callback URL to `<vercel-url>/ng/checkout/paystack/callback`.
+4. The API must be live before the first Vercel build, because pages are pre-rendered from it.
+
+Shop settings such as the WhatsApp number come from the API (`GET /store/areve/config`); `NEXT_PUBLIC_WHATSAPP_NUMBER` is only a fallback.
+
 ## Next tasks (Phase 1)
 
 - [ ] Design system pass from the AREVÉ brand (typography scale, buttons, product cards)
