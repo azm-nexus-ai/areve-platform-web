@@ -14,6 +14,7 @@ Owner: Fawwaz Sanni Ola Dotun · Backend: [areve-platform-api](../areve-platform
 - **Paystack checkout (redirect flow)**: "Pay with Paystack" sends the customer to Paystack;
   Paystack returns them to `/ng/checkout/paystack/callback`, which completes the order
 - WhatsApp click-to-chat link in the footer (`NEXT_PUBLIC_WHATSAPP_NUMBER`)
+- **LAWDE Shield monitoring**: server-side rendering, route-handler and server-action errors are reported via `src/instrumentation.ts` when `LAWDE_API_KEY` is set (browser capture to follow)
 - CI: install, plus build once the staging API secrets are added
 
 ## Run locally
@@ -29,7 +30,7 @@ npm run dev                   # http://localhost:8000
 ## Deploy on Vercel
 
 1. Vercel → Add New Project → import `azm-nexus-ai/areve-platform-web` (framework: Next.js, defaults are fine).
-2. Environment variables: `MEDUSA_BACKEND_URL` (the Railway API URL), `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`, `NEXT_PUBLIC_BASE_URL` (the Vercel URL), `NEXT_PUBLIC_DEFAULT_REGION=ng`, `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY`, `REVALIDATE_SECRET`.
+2. Environment variables: `MEDUSA_BACKEND_URL` (the Railway API URL), `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`, `NEXT_PUBLIC_BASE_URL` (the Vercel URL), `NEXT_PUBLIC_DEFAULT_REGION=ng`, `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY`, `REVALIDATE_SECRET`, `LAWDE_API_KEY`, `LAWDE_APP_ID`, `LAWDE_ENVIRONMENT=production` (or `staging`).
 3. Add the Vercel URL to the API's `STORE_CORS`, and set the Paystack callback URL to `<vercel-url>/ng/checkout/paystack/callback`.
 4. The API must be live before the first Vercel build, because pages are pre-rendered from it.
 
