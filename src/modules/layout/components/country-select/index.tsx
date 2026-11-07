@@ -27,32 +27,37 @@ type CountrySelectProps = {
 }
 
 const CountrySelect = ({ toggleState, regions }: CountrySelectProps) => {
-  const [current, setCurrent] = useState<
-    | { country: string | undefined; region: string; label: string | undefined }
-    | undefined
-  >(undefined)
+  const [current, setCurrent] = useState<CountryOption>()
 
-  const { countryCode } = useParams()
+  const countryCodeParam = useParams().countryCode
+  const countryCode = Array.isArray(countryCodeParam)
+    ? countryCodeParam[0]
+    : countryCodeParam
   const currentPath = usePathname().split(`/${countryCode}`)[1]
 
   const { state, close } = toggleState
 
-  const options = useMemo(() => {
+  const options = useMemo<CountryOption[]>(() => {
     return regions
-      ?.map((r) => {
-        return r.countries?.map((c) => ({
-          country: c.iso_2,
-          region: r.id,
-          label: c.display_name,
-        }))
-      })
-      .flat()
-      .sort((a, b) => (a?.label ?? "").localeCompare(b?.label ?? ""))
+      .flatMap((region) =>
+        (region.countries ?? []).flatMap((country) =>
+          country.iso_2 && country.display_name
+            ? [
+                {
+                  country: country.iso_2,
+                  region: region.id,
+                  label: country.display_name,
+                },
+              ]
+            : []
+        )
+      )
+      .sort((a, b) => a.label.localeCompare(b.label))
   }, [regions])
 
   useEffect(() => {
     if (countryCode) {
-      const option = options?.find((o) => o?.country === countryCode)
+      const option = options.find((o) => o.country === countryCode)
       setCurrent(option)
     }
   }, [options, countryCode])
@@ -69,7 +74,7 @@ const CountrySelect = ({ toggleState, regions }: CountrySelectProps) => {
         onChange={handleChange}
         defaultValue={
           countryCode
-            ? options?.find((o) => o?.country === countryCode)
+            ? options.find((o) => o.country === countryCode)
             : undefined
         }
       >
@@ -104,10 +109,10 @@ const CountrySelect = ({ toggleState, regions }: CountrySelectProps) => {
               className="absolute -bottom-[calc(100%-36px)] left-0 xsmall:left-auto xsmall:right-0 max-h-[442px] overflow-y-scroll z-[900] bg-white drop-shadow-md text-small-regular uppercase text-black no-scrollbar rounded-rounded w-full"
               static
             >
-              {options?.map((o, index) => {
+              {options.map((o) => {
                 return (
                   <ListboxOption
-                    key={index}
+                    key={`${o.region}-${o.country}`}
                     value={o}
                     className="py-2 hover:bg-gray-200 px-3 cursor-pointer flex items-center gap-x-2"
                   >
@@ -118,9 +123,9 @@ const CountrySelect = ({ toggleState, regions }: CountrySelectProps) => {
                         width: "16px",
                         height: "16px",
                       }}
-                      countryCode={o?.country ?? ""}
+                      countryCode={o.country}
                     />{" "}
-                    {o?.label}
+                    {o.label}
                   </ListboxOption>
                 )
               })}
