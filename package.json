@@ -2,8 +2,8 @@
   "name": "areve-platform-web",
   "version": "0.1.0",
   "private": true,
-  "author": "AREV\u00c9",
-  "description": "AREV\u00c9 Online Shop \u2014 storefront (Next.js + Medusa)",
+  "author": "AREVÉ",
+  "description": "AREVÉ Online Shop — storefront (Next.js + Medusa)",
   "scripts": {
     "dev": "next dev --turbopack -p 8000",
     "build": "next build",
@@ -16,6 +16,7 @@
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource/cormorant-garamond": "^5.3.0",
     "@headlessui/react": "^2.2.0",
+    "@lawdeshield/agent": "^0.2.0",
     "@medusajs/icons": "latest",
     "@medusajs/js-sdk": "latest",
     "@medusajs/ui": "latest",
