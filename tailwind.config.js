@@ -28,6 +28,36 @@ module.exports = {
           ivory: "#FAF7F2",
           sand: "#E9E1D6",
         },
+        // Semantic aliases keep components independent from palette names.
+        // Error is a functional accessibility colour, not a brand extension.
+        semantic: {
+          surface: {
+            canvas: "#FAF7F2",
+            raised: "#FFFFFF",
+            muted: "#E9E1D6",
+            inverse: "#1C1A17",
+          },
+          text: {
+            primary: "#1C1A17",
+            muted: "#4B5563",
+            accent: "#685640",
+            inverse: "#FAF7F2",
+            error: "#B42318",
+          },
+          action: {
+            primary: "#685640",
+            primaryText: "#FAF7F2",
+            secondary: "#1C1A17",
+          },
+          border: {
+            subtle: "#E9E1D6",
+            strong: "#685640",
+          },
+          focus: "#685640",
+          status: {
+            error: "#B42318",
+          },
+        },
         grey: {
           0: "#FFFFFF",
           5: "#F9FAFB",
