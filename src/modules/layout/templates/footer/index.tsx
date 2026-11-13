@@ -1,5 +1,6 @@
 import { listCategories } from "@lib/data/categories"
 import { listCollections } from "@lib/data/collections"
+import { getAreveConfig } from "@lib/data/areve"
 import { Text, clx } from "@medusajs/ui"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -9,6 +10,11 @@ export default async function Footer() {
     fields: "*products",
   })
   const productCategories = await listCategories()
+  // WhatsApp number comes from the API (WHATSAPP_NUMBER on the backend);
+  // the storefront env var is only a fallback.
+  const areveConfig = await getAreveConfig()
+  const whatsappNumber =
+    areveConfig?.whatsapp_number || process.env.NEXT_PUBLIC_WHATSAPP_NUMBER
 
   return (
     <footer className="border-t border-ui-border-base w-full">
@@ -110,10 +116,10 @@ export default async function Footer() {
             <div className="flex flex-col gap-y-2">
               <span className="txt-small-plus txt-ui-fg-base">Customer care</span>
               <ul className="grid grid-cols-1 gap-y-2 text-ui-fg-subtle txt-small">
-                {process.env.NEXT_PUBLIC_WHATSAPP_NUMBER && (
+                {whatsappNumber && (
                   <li>
                     <a
-                      href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}`}
+                      href={`https://wa.me/${whatsappNumber}`}
                       target="_blank"
                       rel="noreferrer"
                       className="hover:text-ui-fg-base"
