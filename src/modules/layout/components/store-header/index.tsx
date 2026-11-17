@@ -4,13 +4,15 @@ import { ReactNode } from "react"
 type StoreHeaderProps = {
   menu: ReactNode
   cart: ReactNode
-  searchHref: string
+  searchHref?: string
+  searchControl?: ReactNode
 }
 
 export default function StoreHeader({
   menu,
   cart,
-  searchHref,
+  searchHref = "/store",
+  searchControl,
 }: StoreHeaderProps) {
   return (
     <header className="border-b border-semantic-border-subtle bg-semantic-surface-canvas text-semantic-text-primary">
@@ -20,12 +22,14 @@ export default function StoreHeader({
       >
         <div className="flex min-w-0 items-center gap-1">
           <div className="min-h-11 min-w-11">{menu}</div>
-          <LocalizedClientLink
-            href={searchHref}
-            className="inline-flex min-h-11 items-center px-3 text-xs font-medium uppercase tracking-[0.08em] hover:text-semantic-text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-semantic-focus"
-          >
-            Search
-          </LocalizedClientLink>
+          {searchControl ?? (
+            <LocalizedClientLink
+              href={searchHref}
+              className="inline-flex min-h-11 items-center px-3 text-xs font-medium uppercase tracking-[0.08em] hover:text-semantic-text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-semantic-focus"
+            >
+              Search
+            </LocalizedClientLink>
+          )}
         </div>
 
         <LocalizedClientLink
@@ -36,7 +40,7 @@ export default function StoreHeader({
           AREVÉ
         </LocalizedClientLink>
 
-        <div className="flex min-h-11 min-w-0 items-center justify-end">
+        <div className="flex min-h-11 min-w-0 items-center justify-end gap-4">
           {cart}
         </div>
       </nav>
