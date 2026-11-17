@@ -11,33 +11,33 @@ import LanguageSelect from "../language-select"
 import { HttpTypes } from "@medusajs/types"
 import { Locale } from "@lib/data/locales"
 
-const SideMenuItems = {
-  Home: "/",
-  Store: "/store",
-  Account: "/account",
-  Cart: "/cart",
-}
-
 type SideMenuProps = {
   regions: HttpTypes.StoreRegion[] | null
   locales: Locale[] | null
   currentLocale: string | null
+  categories: HttpTypes.StoreProductCategory[]
 }
 
-const SideMenu = ({ regions, locales, currentLocale }: SideMenuProps) => {
+const SideMenu = ({
+  regions,
+  locales,
+  currentLocale,
+  categories,
+}: SideMenuProps) => {
   const countryToggleState = useToggleState()
   const languageToggleState = useToggleState()
+  const topLevelCategories = categories.filter((category) => !category.parent_category)
 
   return (
     <div className="h-full">
-      <div className="flex items-center h-full">
-        <Popover className="h-full flex">
+      <div className="flex h-full items-center">
+        <Popover className="flex h-full">
           {({ open, close }) => (
             <>
               <div className="relative flex h-full">
                 <Popover.Button
                   data-testid="nav-menu-button"
-                  className="relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none hover:text-ui-fg-base"
+                  className="relative flex min-h-11 items-center text-xs font-medium uppercase tracking-[0.08em] text-semantic-text-primary transition-colors hover:text-semantic-text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-semantic-focus"
                 >
                   Menu
                 </Popover.Button>
@@ -45,7 +45,7 @@ const SideMenu = ({ regions, locales, currentLocale }: SideMenuProps) => {
 
               {open && (
                 <div
-                  className="fixed inset-0 z-[50] bg-black/0 pointer-events-auto"
+                  className="fixed inset-0 z-[50] bg-semantic-surface-inverse/40"
                   onClick={close}
                   data-testid="side-menu-backdrop"
                 />
@@ -54,82 +54,118 @@ const SideMenu = ({ regions, locales, currentLocale }: SideMenuProps) => {
               <Transition
                 show={open}
                 as={Fragment}
-                enter="transition ease-out duration-150"
-                enterFrom="opacity-0"
-                enterTo="opacity-100 backdrop-blur-2xl"
+                enter="transition ease-out duration-200"
+                enterFrom="-translate-x-full"
+                enterTo="translate-x-0"
                 leave="transition ease-in duration-150"
-                leaveFrom="opacity-100 backdrop-blur-2xl"
-                leaveTo="opacity-0"
+                leaveFrom="translate-x-0"
+                leaveTo="-translate-x-full"
               >
-                <PopoverPanel className="flex flex-col absolute w-full pr-4 sm:pr-0 sm:w-1/3 2xl:w-1/4 sm:min-w-min h-[calc(100vh-1rem)] z-[51] inset-x-0 text-sm text-ui-fg-on-color m-2 backdrop-blur-2xl">
-                  <div
-                    data-testid="nav-menu-popup"
-                    className="flex flex-col h-full bg-[rgba(3,7,18,0.5)] rounded-rounded justify-between p-6"
-                  >
-                    <div className="flex justify-end" id="xmark">
-                      <button data-testid="close-menu-button" onClick={close}>
-                        <XMark />
-                      </button>
-                    </div>
-                    <ul className="flex flex-col gap-6 items-start justify-start">
-                      {Object.entries(SideMenuItems).map(([name, href]) => {
-                        return (
-                          <li key={name}>
+                <PopoverPanel className="fixed inset-y-0 left-0 z-[51] flex w-[min(90vw,420px)] flex-col bg-semantic-surface-canvas text-semantic-text-primary shadow-xl">
+                  <div className="flex items-center justify-between border-b border-semantic-border-subtle px-5 py-4">
+                    <span className="font-serif text-2xl tracking-[0.18em]">AREVÉ</span>
+                    <button
+                      type="button"
+                      data-testid="close-menu-button"
+                      onClick={close}
+                      className="inline-flex min-h-11 min-w-11 items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-semantic-focus"
+                      aria-label="Close menu"
+                    >
+                      <XMark />
+                    </button>
+                  </div>
+
+                  <div className="flex flex-1 flex-col overflow-y-auto px-5 py-6">
+                    <LocalizedClientLink
+                      href="/store"
+                      onClick={close}
+                      className="mb-6 font-serif text-3xl hover:text-semantic-text-accent"
+                    >
+                      Shop all
+                    </LocalizedClientLink>
+
+                    <nav aria-label="Product categories">
+                      <ul className="divide-y divide-semantic-border-subtle">
+                        {topLevelCategories.map((category) => (
+                          <li key={category.id} className="py-4">
                             <LocalizedClientLink
-                              href={href}
-                              className="text-3xl leading-10 hover:text-ui-fg-disabled"
+                              href={`/categories/${category.handle}`}
                               onClick={close}
-                              data-testid={`${name.toLowerCase()}-link`}
+                              className="font-serif text-2xl hover:text-semantic-text-accent"
                             >
-                              {name}
+                              {category.name}
                             </LocalizedClientLink>
-                          </li>
-                        )
-                      })}
-                    </ul>
-                    <div className="flex flex-col gap-y-6">
-                      {!!locales?.length && (
-                        <div
-                          className="flex justify-between"
-                          onMouseEnter={languageToggleState.open}
-                          onMouseLeave={languageToggleState.close}
-                        >
-                          <LanguageSelect
-                            toggleState={languageToggleState}
-                            locales={locales}
-                            currentLocale={currentLocale}
-                          />
-                          <ArrowRightMini
-                            className={clx(
-                              "transition-transform duration-150",
-                              languageToggleState.state ? "-rotate-90" : ""
+                            {!!category.category_children?.length && (
+                              <ul className="mt-3 space-y-2">
+                                {category.category_children.map((child) => (
+                                  <li key={child.id}>
+                                    <LocalizedClientLink
+                                      href={`/categories/${child.handle}`}
+                                      onClick={close}
+                                      className="text-sm text-semantic-text-muted hover:text-semantic-text-accent"
+                                    >
+                                      {child.name}
+                                    </LocalizedClientLink>
+                                  </li>
+                                ))}
+                              </ul>
                             )}
-                          />
-                        </div>
-                      )}
+                          </li>
+                        ))}
+                      </ul>
+                    </nav>
+
+                    <div className="mt-8 grid grid-cols-2 gap-3 border-t border-semantic-border-subtle pt-6 text-sm">
+                      <LocalizedClientLink href="/account" onClick={close}>
+                        Account
+                      </LocalizedClientLink>
+                      <LocalizedClientLink href="/cart" onClick={close}>
+                        Cart
+                      </LocalizedClientLink>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-semantic-border-subtle p-5">
+                    {!!locales?.length && (
                       <div
-                        className="flex justify-between"
-                        onMouseEnter={countryToggleState.open}
-                        onMouseLeave={countryToggleState.close}
+                        className="mb-4 flex justify-between"
+                        onMouseEnter={languageToggleState.open}
+                        onMouseLeave={languageToggleState.close}
                       >
-                        {regions && (
-                          <CountrySelect
-                            toggleState={countryToggleState}
-                            regions={regions}
-                          />
-                        )}
+                        <LanguageSelect
+                          toggleState={languageToggleState}
+                          locales={locales}
+                          currentLocale={currentLocale}
+                        />
                         <ArrowRightMini
                           className={clx(
                             "transition-transform duration-150",
-                            countryToggleState.state ? "-rotate-90" : ""
+                            languageToggleState.state ? "-rotate-90" : ""
                           )}
                         />
                       </div>
-                      <Text className="flex justify-between txt-compact-small">
-                        © {new Date().getFullYear()} AREVÉ. All rights
-                        reserved.
-                      </Text>
+                    )}
+                    <div
+                      className="flex justify-between"
+                      onMouseEnter={countryToggleState.open}
+                      onMouseLeave={countryToggleState.close}
+                    >
+                      {regions && (
+                        <CountrySelect
+                          toggleState={countryToggleState}
+                          regions={regions}
+                        />
+                      )}
+                      <ArrowRightMini
+                        className={clx(
+                          "transition-transform duration-150",
+                          countryToggleState.state ? "-rotate-90" : ""
+                        )}
+                      />
                     </div>
+                    <Text className="mt-5 txt-compact-small text-semantic-text-muted">
+                      © {new Date().getFullYear()} AREVÉ. All rights reserved.
+                    </Text>
                   </div>
                 </PopoverPanel>
               </Transition>
