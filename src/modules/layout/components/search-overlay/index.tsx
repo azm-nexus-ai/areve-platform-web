@@ -16,6 +16,7 @@ export default function SearchOverlay() {
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<SearchResult[]>([])
   const [hasSearched, setHasSearched] = useState(false)
+  const [searchError, setSearchError] = useState(false)
   const [isPending, startTransition] = useTransition()
 
   const close = () => setIsOpen(false)
@@ -30,10 +31,17 @@ export default function SearchOverlay() {
       return
     }
 
+    setSearchError(false)
     startTransition(async () => {
-      const nextResults = await searchProducts(trimmedQuery, countryCode)
-      setResults(nextResults)
-      setHasSearched(true)
+      try {
+        const nextResults = await searchProducts(trimmedQuery, countryCode)
+        setResults(nextResults)
+      } catch {
+        setResults([])
+        setSearchError(true)
+      } finally {
+        setHasSearched(true)
+      }
     })
   }
 
@@ -95,6 +103,10 @@ export default function SearchOverlay() {
               <div className="min-h-48 p-5">
                 {isPending ? (
                   <p className="text-sm text-semantic-text-muted">Searching products…</p>
+                ) : searchError ? (
+                  <p className="text-sm text-semantic-text-error">
+                    Search is temporarily unavailable. Please try again.
+                  </p>
                 ) : results.length > 0 ? (
                   <ul className="grid grid-cols-1 gap-3 small:grid-cols-2">
                     {results.map((product) => (
