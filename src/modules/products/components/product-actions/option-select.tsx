@@ -1,8 +1,7 @@
 import { HttpTypes } from "@medusajs/types"
 import { clx } from "@medusajs/ui"
-import React from "react"
 
-type OptionSelectProps = {
+type Props = {
   option: HttpTypes.StoreProductOption
   current: string | undefined
   updateOption: (title: string, value: string) => void
@@ -11,46 +10,29 @@ type OptionSelectProps = {
   "data-testid"?: string
 }
 
-const OptionSelect: React.FC<OptionSelectProps> = ({
-  option,
-  current,
-  updateOption,
-  title,
-  "data-testid": dataTestId,
-  disabled,
-}) => {
-  const filteredOptions = (option.values ?? []).map((v) => v.value)
-
+export default function OptionSelect({ option, current, updateOption, title, disabled, "data-testid": dataTestId }: Props) {
+  const values = (option.values ?? []).map((v) => v.value)
   return (
-    <div className="flex flex-col gap-y-3">
-      <span className="text-sm">Select {title}</span>
-      <div
-        className="flex flex-wrap justify-between gap-2"
-        data-testid={dataTestId}
-      >
-        {filteredOptions.map((v) => {
-          return (
-            <button
-              onClick={() => updateOption(option.id, v)}
-              key={v}
-              className={clx(
-                "border-ui-border-base bg-ui-bg-subtle border text-small-regular h-10 rounded-rounded p-2 flex-1 ",
-                {
-                  "border-ui-border-interactive": v === current,
-                  "hover:shadow-elevation-card-rest transition-shadow ease-in-out duration-150":
-                    v !== current,
-                }
-              )}
-              disabled={disabled}
-              data-testid="option-button"
-            >
-              {v}
-            </button>
-          )
-        })}
+    <fieldset className="flex flex-col gap-3">
+      <legend className="text-sm font-semibold text-semantic-text-primary">Select {title}</legend>
+      <div className="flex flex-wrap gap-2" data-testid={dataTestId}>
+        {values.map((value) => (
+          <button
+            type="button"
+            key={value}
+            onClick={() => updateOption(option.id, value)}
+            aria-pressed={value === current}
+            className={clx(
+              "min-h-11 min-w-11 flex-1 border px-3 py-2 text-sm text-semantic-text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-semantic-focus",
+              value === current ? "border-semantic-border-strong bg-semantic-surface-muted" : "border-semantic-border-subtle bg-semantic-surface-canvas hover:border-semantic-border-strong"
+            )}
+            disabled={disabled}
+            data-testid="option-button"
+          >
+            {value}
+          </button>
+        ))}
       </div>
-    </div>
+    </fieldset>
   )
 }
-
-export default OptionSelect

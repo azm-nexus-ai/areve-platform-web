@@ -70,7 +70,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
           leaveTo="opacity-0"
         >
           <div
-            className="bg-white flex flex-col gap-y-3 justify-center items-center text-large-regular p-4 h-full w-full border-t border-gray-200"
+            className="bg-semantic-surface-canvas flex flex-col gap-y-3 justify-center items-center text-large-regular p-4 pb-[max(1rem,env(safe-area-inset-bottom))] h-full w-full border-t border-semantic-border-subtle"
             data-testid="mobile-actions"
           >
             <div className="flex items-center gap-x-2">
@@ -118,7 +118,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
               </Button>}
               <Button
                 onClick={handleAddToCart}
-                disabled={!inStock || !variant}
+                disabled={!inStock || !variant || isAdding || optionsDisabled}
                 className="w-full"
                 isLoading={isAdding}
                 data-testid="mobile-cart-button"
