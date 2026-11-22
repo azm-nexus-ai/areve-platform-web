@@ -6,13 +6,11 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 type Props = { region: HttpTypes.StoreRegion }
 
 export default async function NewIn({ region }: Props) {
-  const { response: { products } } = await listProducts({
+  const { response: { products: latest } } = await listProducts({
     regionId: region.id,
-    queryParams: { limit: 8 },
+    // Sort before pagination: the newest products might not be in the first unsorted eight.
+    queryParams: { limit: 4, order: "-created_at" },
   })
-  const latest = [...products]
-    .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
-    .slice(0, 4)
 
   if (!latest.length) return null
 
