@@ -85,7 +85,7 @@ export default async function Home({ params }: { params: Promise<{ countryCode: 
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-semantic-text-accent">Considered living</p>
           <h2 id="story-heading" className="font-serif text-3xl leading-tight text-semantic-text-primary small:text-4xl">The little details make a space your own.</h2>
           <p className="mt-5 max-w-lg text-base leading-7 text-semantic-text-muted">
-            Explore bedding, fragrance and home essentials for everyday rituals, special occasions and everything in between.
+            Explore AREVÉ bedding, fragrance and home essentials for everyday rituals, special occasions and everything in between.
           </p>
           <LocalizedClientLink href="/store" className="mt-6 inline-flex min-h-11 items-center text-sm font-semibold text-semantic-text-accent underline underline-offset-4">
             Discover the shop
