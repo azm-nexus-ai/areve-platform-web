@@ -21,7 +21,7 @@ export default async function CheckoutForm({
   const paymentMethods = await listCartPaymentMethods(cart.region?.id ?? "")
 
   if (!shippingMethods || !paymentMethods) {
-    return null
+    return <p role="alert" className="text-sm text-semantic-text-error">Checkout options are temporarily unavailable. Please try again later.</p>
   }
 
   return (

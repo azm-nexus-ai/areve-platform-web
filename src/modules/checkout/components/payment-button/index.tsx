@@ -185,14 +185,23 @@ const PaystackPaymentButton = ({
     | undefined
 
   const handlePayment = () => {
-    if (!authorizationUrl) {
-      setErrorMessage(
-        "We couldn't start your Paystack payment. Please go back and choose a payment method again."
-      )
+    let safeUrl: URL | null = null
+    try {
+      if (authorizationUrl) {
+        const parsed = new URL(authorizationUrl)
+        if (parsed.protocol === "https:" && (parsed.hostname === "paystack.com" || parsed.hostname.endsWith(".paystack.com"))) {
+          safeUrl = parsed
+        }
+      }
+    } catch {
+      safeUrl = null
+    }
+    if (!safeUrl) {
+      setErrorMessage("Paystack payment is not available. Please return to payment and try again.")
       return
     }
     setSubmitting(true)
-    window.location.href = authorizationUrl
+    window.location.assign(safeUrl.href)
   }
 
   return (
