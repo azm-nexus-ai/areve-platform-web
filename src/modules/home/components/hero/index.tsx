@@ -1,29 +1,49 @@
 import Image from "next/image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import type { StorefrontContent } from "@lib/util/areve-config"
 
-const Hero = () => {
+type Props = { content: StorefrontContent["hero"] }
+
+export default function Hero({ content }: Props) {
+  const hasImage = Boolean(content.image_url)
+  const buttonClasses = "inline-flex min-h-11 items-center justify-center bg-semantic-action-primary px-7 py-3 text-xs font-semibold uppercase tracking-[0.15em] text-semantic-action-primaryText transition-colors hover:bg-semantic-surface-inverse focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-semantic-focus"
+
   return (
-    <section className="w-full border-b border-ui-border-base bg-areve-ivory">
-      <div className="content-container flex flex-col items-center justify-center text-center gap-8 py-24 small:py-32">
-        <Image
-          src="/areve-logo.png"
-          alt="AREVÉ"
-          width={240}
-          height={185}
-          priority
-        />
-        <p className="font-serif text-2xl small:text-3xl text-areve-ink max-w-xl leading-snug">
-          Luxurious living &amp; home essentials, delivered across Lagos.
-        </p>
-        <LocalizedClientLink
-          href="/store"
-          className="inline-flex items-center justify-center px-8 py-3 bg-areve-bronze text-white uppercase tracking-[0.2em] text-sm hover:bg-areve-ink transition-colors"
-        >
-          Shop the collection
-        </LocalizedClientLink>
+    <section aria-label="AREVÉ home introduction" className="relative w-full overflow-hidden bg-areve-sand">
+      <div className="relative flex aspect-[4/5] min-h-[440px] items-center justify-center small:aspect-[16/9] small:min-h-[480px]">
+        {content.image_url ? (
+          <>
+            <Image
+              src={content.image_url}
+              alt=""
+              fill
+              priority
+              unoptimized
+              sizes="100vw"
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-black/40" aria-hidden="true" />
+          </>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-areve-ivory via-areve-sand to-areve-ivory" aria-hidden="true" />
+        )}
+        <div className="content-container relative z-10 flex w-full flex-col items-center gap-6 px-6 text-center">
+          <p className={`text-xs font-semibold uppercase tracking-[0.25em] ${hasImage ? "text-white" : "text-semantic-text-accent"}`}>AREVÉ</p>
+          <h1 className={`max-w-3xl font-serif text-4xl leading-tight xsmall:text-5xl medium:text-6xl ${hasImage ? "text-white" : "text-semantic-text-primary"}`}>
+            {content.headline}
+          </h1>
+          {content.subheadline && (
+            <p className={`max-w-xl text-base leading-7 small:text-lg ${hasImage ? "text-white" : "text-semantic-text-muted"}`}>
+              {content.subheadline}
+            </p>
+          )}
+          {content.cta_link.startsWith("/") ? (
+            <LocalizedClientLink href={content.cta_link} className={buttonClasses}>{content.cta_label}</LocalizedClientLink>
+          ) : (
+            <a href={content.cta_link} target="_blank" rel="noopener noreferrer" className={buttonClasses}>{content.cta_label}</a>
+          )}
+        </div>
       </div>
     </section>
   )
 }
-
-export default Hero

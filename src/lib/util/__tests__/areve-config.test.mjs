@@ -16,6 +16,7 @@ test("uses the API settings and normalises the WhatsApp number", () => {
     free_delivery_threshold: 250000,
     whatsapp_number: "2348012345678",
     support_email: "care@example.com",
+    content: AREVE_CONFIG_DEFAULTS.content,
   })
 })
 
@@ -48,4 +49,36 @@ test("works out how far a cart is from free delivery", () => {
   assert.equal(amountToFreeDelivery(255000, config), 45000)
   assert.equal(amountToFreeDelivery(300000, config), 0)
   assert.equal(amountToFreeDelivery(410000, config), 0)
+})
+
+
+test("reads admin-managed hero and announcement content from the API", () => {
+  const config = resolveAreveConfig({
+    content: {
+      announcement: { enabled: true, text: "New arrivals", link: "/collections/new-in" },
+      hero: {
+        headline: "A new collection",
+        subheadline: "Considered details.",
+        cta_label: "Browse",
+        cta_link: "/store",
+        image_url: "https://images.example.com/hero.webp",
+      },
+    },
+  })
+  assert.equal(config.content.announcement.enabled, true)
+  assert.equal(config.content.announcement.text, "New arrivals")
+  assert.equal(config.content.hero.headline, "A new collection")
+  assert.equal(config.content.hero.image_url, "https://images.example.com/hero.webp")
+})
+
+test("rejects unsafe content links and uses defaults", () => {
+  const config = resolveAreveConfig({
+    content: {
+      announcement: { enabled: true, text: "Offers", link: "javascript:alert(1)" },
+      hero: { cta_link: "javascript:alert(1)", image_url: "javascript:alert(1)" },
+    },
+  })
+  assert.equal(config.content.announcement.link, null)
+  assert.equal(config.content.hero.cta_link, "/store")
+  assert.equal(config.content.hero.image_url, null)
 })
