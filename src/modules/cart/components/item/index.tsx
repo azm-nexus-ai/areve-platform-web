@@ -40,9 +40,11 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       })
   }
 
-  // TODO: Update this to grab the actual max inventory
-  const maxQtyFromInventory = 10
-  const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
+  const inventoryLimited = item.variant?.manage_inventory && !item.variant?.allow_backorder
+  const available = inventoryLimited
+    ? Math.max(item.quantity, item.variant?.inventory_quantity ?? item.quantity)
+    : Math.max(10, item.quantity)
+  const maxQuantity = Math.min(available, 99)
 
   return (
     <Table.Row className="w-full" data-testid="product-row">
@@ -82,21 +84,9 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
               className="w-14 h-10 p-4"
               data-testid="product-select-button"
             >
-              {/* TODO: Update this with the v2 way of managing inventory */}
-              {Array.from(
-                {
-                  length: Math.min(maxQuantity, 10),
-                },
-                (_, i) => (
-                  <option value={i + 1} key={i}>
-                    {i + 1}
-                  </option>
-                )
-              )}
-
-              <option value={1} key={1}>
-                1
-              </option>
+              {Array.from({ length: maxQuantity }, (_, index) => (
+                <option value={index + 1} key={index + 1}>{index + 1}</option>
+              ))}
             </CartItemSelect>
             {updating && <Spinner />}
           </div>
