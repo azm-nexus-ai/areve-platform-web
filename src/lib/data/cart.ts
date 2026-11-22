@@ -339,9 +339,16 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
     if (!formData) {
       throw new Error("No form data found when setting addresses")
     }
-    const cartId = getCartId()
+    const cartId = await getCartId()
     if (!cartId) {
       throw new Error("No existing cart found when setting addresses")
+    }
+
+    const email = String(formData.get("email") || "").trim()
+    const state = String(formData.get("shipping_address.province") || "").trim()
+    const area = String(formData.get("shipping_address.address_2") || "").trim()
+    if (!email || !state || !area) {
+      throw new Error("Email, state and area/district are required.")
     }
 
     const data = {
@@ -349,7 +356,7 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
         first_name: formData.get("shipping_address.first_name"),
         last_name: formData.get("shipping_address.last_name"),
         address_1: formData.get("shipping_address.address_1"),
-        address_2: "",
+        address_2: area,
         company: formData.get("shipping_address.company"),
         postal_code: formData.get("shipping_address.postal_code"),
         city: formData.get("shipping_address.city"),
@@ -357,7 +364,7 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
         province: formData.get("shipping_address.province"),
         phone: formData.get("shipping_address.phone"),
       },
-      email: formData.get("email"),
+      email,
     } as any
 
     const sameAsBilling = formData.get("same_as_billing")
