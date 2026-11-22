@@ -1,51 +1,38 @@
-import ItemsTemplate from "./items"
-import Summary from "./summary"
+import { HttpTypes } from "@medusajs/types"
+import { getAreveConfig } from "@lib/data/areve"
+import DeliveryProgress from "@modules/cart/components/delivery-progress"
+import GiftMessage from "@modules/cart/components/gift-message"
 import EmptyCartMessage from "../components/empty-cart-message"
 import SignInPrompt from "../components/sign-in-prompt"
-import Divider from "@modules/common/components/divider"
-import { HttpTypes } from "@medusajs/types"
+import ItemsTemplate from "./items"
+import Summary from "./summary"
 
-const CartTemplate = ({
-  cart,
-  customer,
-}: {
-  cart: HttpTypes.StoreCart | null
-  customer: HttpTypes.StoreCustomer | null
-}) => {
+type Props = { cart: HttpTypes.StoreCart | null; customer: HttpTypes.StoreCustomer | null }
+
+export default async function CartTemplate({ cart, customer }: Props) {
+  const config = await getAreveConfig()
+  const initialMessage = typeof cart?.metadata?.gift_message === "string" ? cart.metadata.gift_message : ""
+
   return (
-    <div className="py-12">
-      <div className="content-container" data-testid="cart-container">
-        {cart?.items?.length ? (
-          <div className="grid grid-cols-1 small:grid-cols-[1fr_360px] gap-x-40">
-            <div className="flex flex-col bg-white py-6 gap-y-6">
-              {!customer && (
-                <>
-                  <SignInPrompt />
-                  <Divider />
-                </>
-              )}
+    <main className="content-container py-10 small:py-16" data-testid="cart-container">
+      <h1 className="mb-8 font-serif text-4xl text-semantic-text-primary">Your cart</h1>
+      {cart?.items?.length ? (
+        <div className="grid grid-cols-1 gap-10 small:grid-cols-[minmax(0,1fr)_360px] small:gap-12">
+          <div className="min-w-0 space-y-8">
+            {!customer && <SignInPrompt />}
+            <div className="overflow-x-auto bg-semantic-surface-canvas">
               <ItemsTemplate cart={cart} />
             </div>
-            <div className="relative">
-              <div className="flex flex-col gap-y-8 sticky top-12">
-                {cart && cart.region && (
-                  <>
-                    <div className="bg-white py-6">
-                      <Summary cart={cart as any} />
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
+            <GiftMessage initialValue={initialMessage} />
           </div>
-        ) : (
-          <div>
-            <EmptyCartMessage />
-          </div>
-        )}
-      </div>
-    </div>
+          <aside className="min-w-0 space-y-5 small:sticky small:top-32 small:self-start" aria-label="Cart summary">
+            <DeliveryProgress itemTotal={cart.item_total ?? 0} config={config} />
+            {cart.region && <Summary cart={cart as HttpTypes.StoreCart & { promotions: HttpTypes.StorePromotion[] }} />}
+          </aside>
+        </div>
+      ) : (
+        <EmptyCartMessage />
+      )}
+    </main>
   )
 }
-
-export default CartTemplate
