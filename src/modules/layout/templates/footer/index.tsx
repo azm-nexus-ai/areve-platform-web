@@ -60,7 +60,7 @@ export default async function Footer() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-8 xsmall:grid-cols-4">
+          <div className={`grid grid-cols-2 gap-8 ${socialLinks.length > 0 ? "xsmall:grid-cols-4" : "xsmall:grid-cols-3"}`}>
             <div>
               <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">
                 Shop
@@ -133,11 +133,9 @@ export default async function Footer() {
               </ul>
             </div>
 
-            <div>
-              <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">
-                Follow
-              </h2>
-              {socialLinks.length > 0 ? (
+            {socialLinks.length > 0 && <div>
+              <h2 className="text-xs font-semibold uppercase tracking-[0.08em]">Follow</h2>
+              {(
                 <ul className="mt-4 space-y-3 text-sm text-semantic-text-muted">
                   {socialLinks.map((link) => (
                     <li key={link.label}>
@@ -152,12 +150,8 @@ export default async function Footer() {
                     </li>
                   ))}
                 </ul>
-              ) : (
-                <p className="mt-4 text-sm text-semantic-text-muted">
-                  Social links pending configuration.
-                </p>
               )}
-            </div>
+            </div>}
           </div>
         </div>
 
