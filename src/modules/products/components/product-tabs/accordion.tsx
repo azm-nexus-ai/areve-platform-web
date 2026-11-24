@@ -53,21 +53,13 @@ const Item: React.FC<AccordionItemProps> = ({
       )}
     >
       <AccordionPrimitive.Header className="px-1">
-        <div className="flex flex-col">
-          <div className="flex w-full items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Text className="text-ui-fg-subtle text-sm">{title}</Text>
-            </div>
-            <AccordionPrimitive.Trigger>
-              {customTrigger || <MorphingTrigger />}
-            </AccordionPrimitive.Trigger>
-          </div>
-          {subtitle && (
-            <Text as="span" size="small" className="mt-1">
-              {subtitle}
-            </Text>
-          )}
-        </div>
+        <AccordionPrimitive.Trigger className="flex min-h-11 w-full items-center justify-between gap-4 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4">
+          <span className="flex flex-col gap-1">
+            <span className="text-ui-fg-subtle text-sm">{title}</span>
+            {subtitle && <span className="text-sm">{subtitle}</span>}
+          </span>
+          <span aria-hidden="true">{customTrigger || <MorphingTrigger />}</span>
+        </AccordionPrimitive.Trigger>
       </AccordionPrimitive.Header>
       <AccordionPrimitive.Content
         forceMount={forceMountContent}

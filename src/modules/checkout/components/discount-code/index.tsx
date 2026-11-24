@@ -61,7 +61,9 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
             <button
               onClick={() => setIsOpen(!isOpen)}
               type="button"
-              className="txt-medium text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
+              aria-expanded={isOpen}
+              aria-controls="promotion-input"
+              className="txt-medium text-blue-800 hover:text-blue-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
               data-testid="add-discount-button"
             >
               Add Promotion Code(s)
@@ -78,6 +80,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({ cart }) => {
                 <Input
                   className="size-full"
                   id="promotion-input"
+                  aria-label="Promotion code"
                   name="code"
                   type="text"
                   autoFocus={false}
