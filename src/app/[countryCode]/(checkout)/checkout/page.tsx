@@ -5,7 +5,8 @@ import CheckoutProgress from "@modules/checkout/components/checkout-progress"
 import CheckoutForm from "@modules/checkout/templates/checkout-form"
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
 import { Metadata } from "next"
-import { notFound, redirect } from "next/navigation"
+import { redirect } from "next/navigation"
+import { checkoutStep } from "@lib/util/checkout-step"
 
 export const metadata: Metadata = { title: "Checkout | AREVÉ" }
 
@@ -16,16 +17,9 @@ export default async function Checkout({
   searchParams: Promise<{ step?: string }>
 }) {
   const [{ countryCode }, query, cart] = await Promise.all([params, searchParams, retrieveCart()])
-  if (!cart?.items?.length) notFound()
-
-  if (!query.step) {
-    const step = !cart.email || !cart.shipping_address?.address_1
-      ? "address"
-      : !cart.shipping_methods?.length
-        ? "delivery"
-        : !cart.payment_collection?.payment_sessions?.length
-          ? "payment"
-          : "review"
+  if (!cart?.items?.length) redirect(`/${countryCode}/cart`)
+  const step = checkoutStep(cart, query.step)
+  if (query.step !== step) {
     redirect(`/${countryCode}/checkout?step=${step}`)
   }
 

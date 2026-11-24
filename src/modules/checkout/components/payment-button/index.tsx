@@ -43,7 +43,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           data-testid={dataTestId}
         />
       )
-    case isManual(paymentSession?.provider_id):
+    case process.env.NODE_ENV !== "production" && isManual(paymentSession?.provider_id):
       return (
         <ManualTestPaymentButton notReady={notReady} data-testid={dataTestId} />
       )
@@ -189,7 +189,7 @@ const PaystackPaymentButton = ({
     try {
       if (authorizationUrl) {
         const parsed = new URL(authorizationUrl)
-        if (parsed.protocol === "https:" && (parsed.hostname === "paystack.com" || parsed.hostname.endsWith(".paystack.com"))) {
+        if (parsed.protocol === "https:" && parsed.hostname === "checkout.paystack.com" && !parsed.username && !parsed.password && !parsed.port) {
           safeUrl = parsed
         }
       }

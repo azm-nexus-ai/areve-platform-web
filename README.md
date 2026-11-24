@@ -44,3 +44,9 @@ Shop settings such as the WhatsApp number come from the API (`GET /store/areve/c
 - [ ] Delivery, returns, privacy and terms pages
 - [ ] Remove Stripe/PayPal code paths once Paystack is confirmed
 - [ ] Fix upstream type errors so `tsc --noEmit` passes (build currently ignores them, as in the starter)
+
+## Checkout regression tests
+
+Run the API with an isolated local PostgreSQL database and the sample seed, then start this storefront with its local publishable key. `npm run test:e2e` exercises product/cart/gift/address/delivery and payment-return recovery at desktop and 375px widths. Install Chromium once with `npx playwright install chromium`. Tests reject a non-local `E2E_BASE_URL` and create synthetic carts only.
+
+The API tests cover Paystack transaction integrity with mocked provider transport. Real Paystack test-mode redirects/webhooks, approved shipping rates and hosted services remain release gates. Manual/system checkout is hidden in production builds and rejected by the hardened API.
