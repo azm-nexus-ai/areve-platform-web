@@ -43,3 +43,10 @@ test("catalogue reaches records beyond 100 and clamps invalid or stale page numb
   await page.goto("/ng/store?q=Browser+Catalogue+Fixture&page=not-a-page")
   await expect(page.getByRole("status").filter({ hasText: "Showing 1–12 of 105 products" })).toBeVisible()
 })
+
+test("serves optimized product imagery with the patched image processor", async ({ request }) => {
+  const image = await request.get("/_next/image?url=%2Fareve-logo.png&w=384&q=75")
+  expect(image.status()).toBe(200)
+  expect(image.headers()["content-type"]).toMatch(/^image\//)
+  expect((await image.body()).byteLength).toBeGreaterThan(100)
+})
