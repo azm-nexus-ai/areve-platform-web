@@ -16,5 +16,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      # Pure helpers only: no install needed, so this runs in seconds.
+          cache: npm
+      # Telemetry boundary tests exercise the installed SDK as well as helpers.
+      - run: npm ci
       - run: npm test

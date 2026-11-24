@@ -30,7 +30,7 @@ npm run dev                   # http://localhost:8000
 ## Deploy on Vercel
 
 1. Vercel → Add New Project → import `azm-nexus-ai/areve-platform-web` (framework: Next.js, defaults are fine).
-2. Environment variables: `MEDUSA_BACKEND_URL` (the Railway API URL), `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`, `NEXT_PUBLIC_BASE_URL` (the Vercel URL), `NEXT_PUBLIC_DEFAULT_REGION=ng`, `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY`, `REVALIDATE_SECRET`, `LAWDE_API_KEY`, `LAWDE_APP_ID`, `LAWDE_ENVIRONMENT=production` (or `staging`), and `NEXT_PUBLIC_R2_PUBLIC_URL` for the public image origin.
+2. Environment variables: `MEDUSA_BACKEND_URL` (the Railway API URL), `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`, `NEXT_PUBLIC_BASE_URL` (the Vercel URL), `NEXT_PUBLIC_DEFAULT_REGION=ng`, `AREVE_ENVIRONMENT=staging` until an approved live release, `LAWDE_API_KEY`, `LAWDE_APP_ID`, `LAWDE_ENVIRONMENT=production` (or `staging`), and `NEXT_PUBLIC_R2_PUBLIC_URL` for the public image origin.
 3. Add the Vercel URL to the API's `STORE_CORS`, and set the Paystack callback URL to `<vercel-url>/ng/checkout/paystack/callback`.
 4. The API must be live before the first Vercel build, because pages are pre-rendered from it.
 
