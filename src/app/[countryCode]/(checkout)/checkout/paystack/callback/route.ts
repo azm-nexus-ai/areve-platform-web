@@ -1,21 +1,22 @@
 import { placeOrder } from "@lib/data/cart"
 import { NextRequest, NextResponse } from "next/server"
 
-/**
- * Paystack redirects the customer here after payment.
- * Completing the cart makes the backend verify the transaction with Paystack;
- * on success placeOrder() redirects to the order confirmation page.
- */
+/** Paystack returns here. The backend verifies the payment before completing the cart. */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ countryCode: string }> }
 ) {
   const { countryCode } = await params
+  const status = request.nextUrl.searchParams.get("status")
+  if (status === "cancelled" || status === "abandoned" || status === "failed") {
+    const url = new URL(`/${countryCode}/checkout`, request.url)
+    url.searchParams.set("step", "review")
+    url.searchParams.set("payment", status)
+    return NextResponse.redirect(url)
+  }
 
-  // placeOrder() throws a Next.js redirect when the order is created.
+  // placeOrder() redirects to the confirmation page only after the backend accepts the order.
   const cart = await placeOrder()
-
-  // Still a cart: payment was not confirmed. Send the customer back to review.
   const url = new URL(`/${countryCode}/checkout`, request.url)
   url.searchParams.set("step", "review")
   url.searchParams.set("payment", cart ? "not_confirmed" : "error")

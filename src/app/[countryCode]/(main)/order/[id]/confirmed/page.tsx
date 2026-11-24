@@ -3,21 +3,16 @@ import OrderCompletedTemplate from "@modules/order/templates/order-completed-tem
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
-type Props = {
-  params: Promise<{ id: string }>
-}
+type Props = { params: Promise<{ id: string }> }
+
 export const metadata: Metadata = {
-  title: "Order Confirmed",
-  description: "You purchase was successful",
+  title: "Order Confirmed | AREVÉ",
+  description: "Your order confirmation and details.",
 }
 
-export default async function OrderConfirmedPage(props: Props) {
-  const params = await props.params
-  const order = await retrieveOrder(params.id).catch(() => null)
-
-  if (!order) {
-    return notFound()
-  }
-
+export default async function OrderConfirmedPage({ params }: Props) {
+  const { id } = await params
+  const order = await retrieveOrder(id).catch(() => null)
+  if (!order) notFound()
   return <OrderCompletedTemplate order={order} />
 }
