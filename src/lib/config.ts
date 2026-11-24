@@ -10,7 +10,10 @@ if (process.env.MEDUSA_BACKEND_URL) {
 
 export const sdk = new Medusa({
   baseUrl: MEDUSA_BACKEND_URL,
-  debug: process.env.NODE_ENV === "development",
+  debug: false,
+  // This SDK instance is shared by server requests. Authentication must come
+  // only from each request's HttpOnly cookie, never process-global memory.
+  auth: { type: "jwt", jwtTokenStorageMethod: "nostore" },
   publishableKey: process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
 })
 

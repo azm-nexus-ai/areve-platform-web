@@ -1,6 +1,5 @@
-import { Disclosure } from "@headlessui/react"
-import { Badge, Button, clx } from "@medusajs/ui"
-import { useEffect } from "react"
+import { Button } from "@medusajs/ui"
+import { useEffect, useId } from "react"
 
 import useToggleState from "@lib/hooks/use-toggle-state"
 import { useFormStatus } from "react-dom"
@@ -27,12 +26,13 @@ const AccountInfo = ({
   'data-testid': dataTestid
 }: AccountInfoProps) => {
   const { state, close, toggle } = useToggleState()
+  const panelId = useId()
 
   const { pending } = useFormStatus()
 
   const handleToggle = () => {
     clearState()
-    setTimeout(() => toggle(), 100)
+    toggle()
   }
 
   useEffect(() => {
@@ -62,61 +62,26 @@ const AccountInfo = ({
             type={state ? "reset" : "button"}
             data-testid="edit-button"
             data-active={state}
+            aria-expanded={state}
+            aria-controls={panelId}
+            aria-label={`${state ? "Cancel editing" : "Edit"} ${label.toLowerCase()}`}
           >
             {state ? "Cancel" : "Edit"}
           </Button>
         </div>
       </div>
 
-      {/* Success state */}
-      <Disclosure>
-        <Disclosure.Panel
-          static
-          className={clx(
-            "transition-[max-height,opacity] duration-300 ease-in-out overflow-hidden",
-            {
-              "max-h-[1000px] opacity-100": isSuccess,
-              "max-h-0 opacity-0": !isSuccess,
-            }
-          )}
-          data-testid="success-message"
-        >
-          <Badge className="p-2 my-4" color="green">
-            <span>{label} updated succesfully</span>
-          </Badge>
-        </Disclosure.Panel>
-      </Disclosure>
+      {isSuccess && <div role="status" data-testid="success-message">
+          <p className="p-2 my-4 text-green-900 bg-green-50 rounded">{label} updated successfully</p>
+      </div>}
 
       {/* Error state  */}
-      <Disclosure>
-        <Disclosure.Panel
-          static
-          className={clx(
-            "transition-[max-height,opacity] duration-300 ease-in-out overflow-hidden",
-            {
-              "max-h-[1000px] opacity-100": isError,
-              "max-h-0 opacity-0": !isError,
-            }
-          )}
-          data-testid="error-message"
-        >
-          <Badge className="p-2 my-4" color="red">
-            <span>{errorMessage}</span>
-          </Badge>
-        </Disclosure.Panel>
-      </Disclosure>
+      {state && isError && <div role="alert" data-testid="error-message">
+          <p className="p-2 my-4 text-red-900 bg-red-50 rounded">{errorMessage}</p>
+      </div>}
 
-      <Disclosure>
-        <Disclosure.Panel
-          static
-          className={clx(
-            "transition-[max-height,opacity] duration-300 ease-in-out overflow-visible",
-            {
-              "max-h-[1000px] opacity-100": state,
-              "max-h-0 opacity-0": !state,
-            }
-          )}
-        >
+      <div id={panelId} hidden={!state}>
+        <fieldset disabled={!state || pending}>
           <div className="flex flex-col gap-y-2 py-4">
             <div>{children}</div>
             <div className="flex items-center justify-end mt-2">
@@ -130,8 +95,8 @@ const AccountInfo = ({
               </Button>
             </div>
           </div>
-        </Disclosure.Panel>
-      </Disclosure>
+        </fieldset>
+      </div>
     </div>
   )
 }
