@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright"
 import { expect, test, type Page } from "@playwright/test"
 
 async function addFixtureProduct(page: Page) {
@@ -10,6 +11,12 @@ async function addFixtureProduct(page: Page) {
 }
 
 test("product → cart → gift message → address → flat-fee delivery", async ({ page }) => {
+  await page.goto("/ng/products/sample-gift-box")
+  const accessible = async (label: string) => {
+    const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()
+    expect.soft(result.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => ({ target: n.target, html: n.html, summary: n.failureSummary })) })), label).toEqual([])
+  }
+  await accessible("product")
   await addFixtureProduct(page)
   await page.goto("/ng/cart")
   await expect(page.getByRole("heading", { name: "Your cart", exact: true })).toBeVisible()
@@ -18,8 +25,10 @@ test("product → cart → gift message → address → flat-fee delivery", asyn
   await expect(page.getByRole("status").filter({ hasText: "Gift message saved." })).toBeVisible()
   await page.reload()
   await expect(page.getByLabel("Your message", { exact: true })).toHaveValue("Happy birthday from the browser fixture")
+  await accessible("cart")
   await page.getByTestId("checkout-button").click()
   await expect(page).toHaveURL(/step=address/)
+  await accessible("checkout address")
   const fields: Record<string, string> = {
     "shipping-first-name-input": "Ada", "shipping-last-name-input": "Fixture",
     "shipping-address-input": "1 Test Street", "shipping-area-input": "Ikeja",
@@ -39,6 +48,7 @@ test("product → cart → gift message → address → flat-fee delivery", asyn
   await page.getByTestId("submit-delivery-option-button").click()
   await expect(page).toHaveURL(/step=payment/)
   await expect(page.locator("main")).toHaveCount(1)
+  await accessible("checkout payment")
 })
 
 test("cross-site payment return retains the real cart cookie", async ({ page, context }) => {
@@ -73,4 +83,30 @@ test("invalid and skipped checkout steps return to the next required step", asyn
     await expect(page).toHaveURL(/step=address/)
     await expect(page.getByTestId("shipping-email-input")).toBeVisible()
   }
+})
+
+
+test("cart quantities update and failed removals remain retryable", async ({ page }) => {
+  await addFixtureProduct(page)
+  await page.goto("/ng/cart")
+  const quantity = page.getByRole("combobox", { name: "Quantity for Sample Housewarming Gift Box" })
+  // The cart payload omits exact stock. The server must still reject a quantity
+  // above the fixture's stock and leave the persisted cart unchanged.
+  await quantity.selectOption("99")
+  await expect(page.getByTestId("product-error-message")).toBeVisible()
+  await expect(quantity).toBeEnabled()
+  await page.reload()
+  await expect(quantity).toHaveValue("1")
+  await quantity.selectOption("2")
+  await expect(quantity).toBeEnabled()
+  await page.reload()
+  await expect(quantity).toHaveValue("2")
+  const remove = page.getByTestId("product-delete-button")
+  await page.route("**/ng/cart", route => route.request().method() === "POST" ? route.abort("failed") : route.continue())
+  await remove.click()
+  await expect(page.locator("main").getByRole("alert")).toContainText("Unable to remove")
+  await expect(remove).toBeEnabled()
+  await page.unroute("**/ng/cart")
+  await remove.click()
+  await expect(page.getByTestId("product-row")).toHaveCount(0)
 })

@@ -42,7 +42,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
 
   const inventoryLimited = item.variant?.manage_inventory && !item.variant?.allow_backorder
   const available = inventoryLimited
-    ? Math.max(item.quantity, item.variant?.inventory_quantity ?? item.quantity)
+    ? Math.max(item.quantity, item.variant?.inventory_quantity ?? 99)
     : Math.max(10, item.quantity)
   const maxQuantity = Math.min(available, 99)
 
@@ -51,6 +51,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       <Table.Cell className="!pl-0 p-4 w-24">
         <LocalizedClientLink
           href={`/products/${item.product_handle}`}
+          aria-label={item.product_title}
           className={clx("flex", {
             "w-16": type === "preview",
             "small:w-24 w-12": type === "full",
@@ -77,8 +78,10 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       {type === "full" && (
         <Table.Cell>
           <div className="flex gap-2 items-center w-28">
-            <DeleteButton id={item.id} data-testid="product-delete-button" />
+            <DeleteButton id={item.id} label={`Remove ${item.product_title} from cart`} data-testid="product-delete-button" />
             <CartItemSelect
+              aria-label={`Quantity for ${item.product_title}`}
+              disabled={updating}
               value={item.quantity}
               onChange={(value) => changeQuantity(parseInt(value.target.value))}
               className="w-14 h-10 p-4"
