@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "View your cart",
 }
 
-export default async function Cart() {
+export default async function Cart({ searchParams }: { searchParams: Promise<{ payment?: string }> }) {
   const cart = await retrieveCart().catch((error) => {
     console.error(error)
     return notFound()
@@ -17,5 +17,6 @@ export default async function Cart() {
 
   const customer = await retrieveCustomer()
 
-  return <CartTemplate cart={cart} customer={customer} />
+  const { payment } = await searchParams
+  return <CartTemplate cart={cart} customer={customer} paymentSessionMissing={payment === "session_missing"} />
 }

@@ -7,15 +7,20 @@ import SignInPrompt from "../components/sign-in-prompt"
 import ItemsTemplate from "./items"
 import Summary from "./summary"
 
-type Props = { cart: HttpTypes.StoreCart | null; customer: HttpTypes.StoreCustomer | null }
+type Props = { cart: HttpTypes.StoreCart | null; customer: HttpTypes.StoreCustomer | null; paymentSessionMissing?: boolean }
 
-export default async function CartTemplate({ cart, customer }: Props) {
+export default async function CartTemplate({ cart, customer, paymentSessionMissing }: Props) {
   const config = await getAreveConfig()
   const initialMessage = typeof cart?.metadata?.gift_message === "string" ? cart.metadata.gift_message : ""
 
   return (
     <main className="content-container py-10 small:py-16" data-testid="cart-container">
       <h1 className="mb-8 font-serif text-4xl text-semantic-text-primary">Your cart</h1>
+      {paymentSessionMissing && (
+        <p role="status" className="mb-6 border border-semantic-border-subtle p-4 text-sm text-semantic-text-primary">
+          This checkout session is no longer available. If you completed payment, check your order confirmation email or contact AREVÉ before paying again.
+        </p>
+      )}
       {cart?.items?.length ? (
         <div className="grid grid-cols-1 gap-10 small:grid-cols-[minmax(0,1fr)_360px] small:gap-12">
           <div className="min-w-0 space-y-8">

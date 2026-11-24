@@ -138,7 +138,7 @@ const Payment = ({
       </div>
       <div>
         <div className={isOpen ? "block" : "hidden"}>
-          {!paidByGiftcard && availablePaymentMethods?.length && (
+          {!paidByGiftcard && availablePaymentMethods?.length > 0 && (
             <>
               <RadioGroup
                 value={selectedPaymentMethod}
@@ -166,6 +166,11 @@ const Payment = ({
                 ))}
               </RadioGroup>
             </>
+          )}
+          {!paidByGiftcard && !availablePaymentMethods?.length && (
+            <p role="alert" className="text-sm text-semantic-text-error">
+              Secure payment is temporarily unavailable. Please try again later or contact AREVÉ.
+            </p>
           )}
 
           {paidByGiftcard && (
