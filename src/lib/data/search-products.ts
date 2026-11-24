@@ -1,10 +1,11 @@
 "use server"
 
+import { catalogueQuery } from "@lib/util/catalogue-query"
 import { listProducts } from "@lib/data/products"
 import { getProductPrice } from "@lib/util/get-product-price"
 
 export async function searchProducts(query: string, countryCode: string) {
-  const trimmedQuery = query.trim()
+  const trimmedQuery = catalogueQuery(query)
 
   if (trimmedQuery.length < 2 || !countryCode) {
     return []

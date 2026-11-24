@@ -23,6 +23,7 @@ export default function SearchOverlay() {
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    if (isPending) return
     const trimmedQuery = query.trim()
     setLastSearchedQuery(trimmedQuery)
     setSearchError(false)
@@ -51,12 +52,13 @@ export default function SearchOverlay() {
       <button
         type="button" onClick={() => setIsOpen(true)}
         className="inline-flex min-h-11 items-center gap-2 px-3 text-xs font-medium uppercase tracking-[0.08em] text-semantic-text-primary hover:text-semantic-text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-semantic-focus"
+        aria-label="Search"
         aria-haspopup="dialog"
       >
         <MagnifyingGlass />
         <span className="hidden xsmall:inline">Search</span>
       </button>
-      <Dialog open={isOpen} onClose={close} className="relative z-[70]">
+      <Dialog open={isOpen} onClose={close} className="fixed inset-0 z-[70]">
         <div className="fixed inset-0 bg-semantic-surface-inverse/40" aria-hidden="true" />
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-start justify-center p-0 small:p-8">
@@ -73,17 +75,17 @@ export default function SearchOverlay() {
                   <MagnifyingGlass className="shrink-0 text-semantic-text-accent" />
                   <input
                     id="store-search" value={query} onChange={(event) => setQuery(event.target.value)}
-                    autoFocus placeholder="Search products"
+                    maxLength={100} autoFocus placeholder="Search products"
                     className="min-h-12 w-full bg-transparent text-base text-semantic-text-primary outline-none placeholder:text-semantic-text-muted"
                   />
-                  <button type="submit" className="min-h-11 px-3 text-xs font-semibold uppercase tracking-[0.08em] text-semantic-text-accent">Search</button>
+                  <button type="submit" disabled={isPending} className="min-h-11 px-3 text-xs font-semibold uppercase tracking-[0.08em] text-semantic-text-accent">Search</button>
                 </div>
               </form>
               <div className="min-h-48 p-5">
                 {isPending ? (
-                  <p className="text-sm text-semantic-text-muted">Searching products…</p>
+                  <p role="status" className="text-sm text-semantic-text-muted">Searching products…</p>
                 ) : searchError ? (
-                  <p className="text-sm text-semantic-text-error">Search is temporarily unavailable. Please try again.</p>
+                  <p role="alert" className="text-sm text-semantic-text-error">Search is temporarily unavailable. Please try again.</p>
                 ) : results.length > 0 ? (
                   <ul className="grid grid-cols-1 gap-3 small:grid-cols-2">
                     {results.map((product) => (
@@ -108,6 +110,9 @@ export default function SearchOverlay() {
                   </p>
                 ) : (
                   <p className="text-sm text-semantic-text-muted">Enter at least two characters to search the live catalogue.</p>
+                )}
+                {hasSearched && !isPending && !searchError && lastSearchedQuery.length >= 2 && results.length > 0 && (
+                  <LocalizedClientLink href={`/store?q=${encodeURIComponent(lastSearchedQuery)}`} onClick={close} className="mt-5 inline-flex min-h-11 items-center underline underline-offset-4">View all results</LocalizedClientLink>
                 )}
               </div>
             </DialogPanel>

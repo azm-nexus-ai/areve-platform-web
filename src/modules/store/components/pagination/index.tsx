@@ -1,5 +1,6 @@
 "use client"
 
+import { visiblePages } from "@lib/util/catalogue-query"
 import { clx } from "@medusajs/ui"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
@@ -16,8 +17,7 @@ export function Pagination({ page, totalPages, "data-testid": dataTestid }: {
     params.set("page", String(newPage))
     router.push(`${pathname}?${params.toString()}`)
   }
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1)
-  const visible = pages.filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
+  const visible = visiblePages(page, totalPages)
 
   return (
     <nav aria-label="Product pages" className="mt-12 flex justify-center" data-testid={dataTestid}>

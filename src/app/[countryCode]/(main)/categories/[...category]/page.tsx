@@ -11,8 +11,6 @@ type Props = {
   searchParams: Promise<{
     sortBy?: SortOptions
     page?: string
-    minPrice?: string
-    maxPrice?: string
     category?: string
   }>
 }
@@ -46,8 +44,6 @@ export default async function CategoryPage({ params, searchParams }: Props) {
       category={productCategory}
       sortBy={filters.sortBy}
       page={filters.page}
-      minPrice={filters.minPrice}
-      maxPrice={filters.maxPrice}
       filterCategoryId={filters.category}
       countryCode={countryCode}
     />

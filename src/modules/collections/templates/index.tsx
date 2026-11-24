@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import { cataloguePage, catalogueSort } from "@lib/util/catalogue-query"
 import { listCategories } from "@lib/data/categories"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
@@ -8,21 +9,19 @@ import PaginatedProducts from "@modules/store/templates/paginated-products"
 import { HttpTypes } from "@medusajs/types"
 
 export default async function CollectionTemplate({
-  sortBy, collection, page, countryCode, minPrice, maxPrice, filterCategoryId,
+  sortBy, collection, page, countryCode, filterCategoryId,
 }: {
   sortBy?: SortOptions
   collection: HttpTypes.StoreCollection
   page?: string
   countryCode: string
-  minPrice?: string
-  maxPrice?: string
   filterCategoryId?: string
 }) {
   const categories = await listCategories()
   const topLevel = categories.filter((c) => !c.parent_category)
   const allowedFilter = topLevel.some((c) => c.id === filterCategoryId) ? filterCategoryId : undefined
-  const sort = sortBy || "created_at"
-  const pageNumber = Math.max(1, Number.parseInt(page || "1", 10) || 1)
+  const sort = catalogueSort(sortBy)
+  const pageNumber = cataloguePage(page)
 
   return (
     <main className="content-container py-8 small:py-12">
@@ -34,8 +33,6 @@ export default async function CollectionTemplate({
       <div className="mt-10 flex flex-col gap-8 small:flex-row small:items-start">
         <RefinementList
           sortBy={sort}
-          minPrice={minPrice}
-          maxPrice={maxPrice}
           categoryId={allowedFilter}
           categoryOptions={topLevel.map((c) => ({ id: c.id, name: c.name }))}
         />
@@ -47,9 +44,7 @@ export default async function CollectionTemplate({
               collectionId={collection.id}
               categoryId={allowedFilter}
               countryCode={countryCode}
-              minPrice={minPrice}
-              maxPrice={maxPrice}
-            />
+                    />
           </Suspense>
         </div>
       </div>

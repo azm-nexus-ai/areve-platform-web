@@ -1,3 +1,4 @@
+const imageHosts = require("./image-hosts")
 const checkEnvVariables = require("./check-env-variables")
 
 checkEnvVariables()
@@ -15,7 +16,7 @@ const nextConfig = {
   reactStrictMode: true,
   logging: {
     fetches: {
-      fullUrl: true,
+      fullUrl: false,
     },
   },
   eslint: {
@@ -23,6 +24,7 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
+      ...imageHosts(process.env.NEXT_PUBLIC_R2_PUBLIC_URL),
       {
         protocol: "http",
         hostname: "localhost",
