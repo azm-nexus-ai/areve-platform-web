@@ -1,66 +1,86 @@
 import { Suspense } from "react"
-
+import { listCategories } from "@lib/data/categories"
 import { listRegions } from "@lib/data/regions"
 import { listLocales } from "@lib/data/locales"
 import { getLocale } from "@lib/data/locale-actions"
+import { getAreveConfig } from "@lib/data/areve"
 import { StoreRegion } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import DeliveryPromiseMessage from "@modules/common/components/delivery-promise-message"
 import CartButton from "@modules/layout/components/cart-button"
+import SearchOverlay from "@modules/layout/components/search-overlay"
 import SideMenu from "@modules/layout/components/side-menu"
+import StoreHeader from "@modules/layout/components/store-header"
 
 export default async function Nav() {
-  const [regions, locales, currentLocale] = await Promise.all([
+  const [regions, locales, currentLocale, categories, config] = await Promise.all([
     listRegions().then((regions: StoreRegion[]) => regions),
     listLocales(),
     getLocale(),
+    listCategories(),
+    getAreveConfig(),
   ])
+  const topLevelCategories = categories.filter((category) => !category.parent_category)
+  const announcement = config.content.announcement
+  const cartAndAccount = (
+    <>
+      <LocalizedClientLink
+        className="hidden text-xs font-medium uppercase tracking-[0.08em] hover:text-semantic-text-accent small:inline-flex"
+        href="/account"
+        data-testid="nav-account-link"
+      >
+        Account
+      </LocalizedClientLink>
+      <Suspense fallback={
+        <LocalizedClientLink className="text-xs font-medium uppercase tracking-[0.08em] hover:text-semantic-text-accent" href="/cart" data-testid="nav-cart-link">
+          Cart (0)
+        </LocalizedClientLink>
+      }>
+        <CartButton />
+      </Suspense>
+    </>
+  )
 
   return (
-    <div className="sticky top-0 inset-x-0 z-50 group">
-      <header className="relative h-16 mx-auto border-b duration-200 bg-white border-ui-border-base">
-        <nav className="content-container txt-xsmall-plus text-ui-fg-subtle flex items-center justify-between w-full h-full text-small-regular">
-          <div className="flex-1 basis-0 h-full flex items-center">
-            <div className="h-full">
-              <SideMenu regions={regions} locales={locales} currentLocale={currentLocale} />
-            </div>
-          </div>
-
-          <div className="flex items-center h-full">
-            <LocalizedClientLink
-              href="/"
-              className="font-serif text-2xl tracking-[0.35em] text-areve-ink hover:text-areve-bronze uppercase"
-              data-testid="nav-store-link"
-            >
-              AREVÉ
-            </LocalizedClientLink>
-          </div>
-
-          <div className="flex items-center gap-x-6 h-full flex-1 basis-0 justify-end">
-            <div className="hidden small:flex items-center gap-x-6 h-full">
-              <LocalizedClientLink
-                className="hover:text-ui-fg-base"
-                href="/account"
-                data-testid="nav-account-link"
-              >
-                Account
+    <div className="small:sticky small:inset-x-0 small:top-0 small:z-50">
+      <div className="bg-semantic-surface-inverse px-4 py-2 text-center text-semantic-text-inverse">
+        {announcement.enabled ? (
+          announcement.link ? (
+            announcement.link.startsWith("/") ? (
+              <LocalizedClientLink href={announcement.link} className="text-sm underline-offset-4 hover:underline">
+                {announcement.text}
               </LocalizedClientLink>
-            </div>
-            <Suspense
-              fallback={
-                <LocalizedClientLink
-                  className="hover:text-ui-fg-base flex gap-2"
-                  href="/cart"
-                  data-testid="nav-cart-link"
-                >
-                  Cart (0)
-                </LocalizedClientLink>
-              }
-            >
-              <CartButton />
-            </Suspense>
+            ) : (
+              <a href={announcement.link} rel="noopener noreferrer" target="_blank" className="text-sm underline-offset-4 hover:underline">
+                {announcement.text}
+              </a>
+            )
+          ) : (
+            <p className="text-sm">{announcement.text}</p>
+          )
+        ) : (
+          <DeliveryPromiseMessage config={config} className="!text-semantic-text-inverse" />
+        )}
+      </div>
+      <div className="sticky inset-x-0 top-0 z-50 small:static">
+        <StoreHeader
+          menu={<SideMenu regions={regions} locales={locales} currentLocale={currentLocale} categories={categories} />}
+          searchControl={<SearchOverlay />}
+          cart={cartAndAccount}
+        />
+      </div>
+      {topLevelCategories.length > 0 && (
+        <nav aria-label="Desktop product navigation" className="hidden border-b border-semantic-border-subtle bg-semantic-surface-canvas small:block">
+          <div className="content-container flex min-h-11 items-center justify-center gap-8 overflow-x-auto text-xs font-medium uppercase tracking-[0.08em] text-semantic-text-primary">
+            <LocalizedClientLink href="/store" className="whitespace-nowrap hover:text-semantic-text-accent">Shop all</LocalizedClientLink>
+            {topLevelCategories.map((category) => (
+              <LocalizedClientLink key={category.id} href={`/categories/${category.handle}`} className="whitespace-nowrap hover:text-semantic-text-accent">
+                {category.name}
+              </LocalizedClientLink>
+            ))}
           </div>
         </nav>
-      </header>
+      )}
     </div>
   )
 }

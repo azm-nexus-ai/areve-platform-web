@@ -1,30 +1,45 @@
 import { retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
 import PaymentWrapper from "@modules/checkout/components/payment-wrapper"
+import CheckoutProgress from "@modules/checkout/components/checkout-progress"
 import CheckoutForm from "@modules/checkout/templates/checkout-form"
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
 import { Metadata } from "next"
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 
-export const metadata: Metadata = {
-  title: "Checkout",
-}
+export const metadata: Metadata = { title: "Checkout | AREVÉ" }
 
-export default async function Checkout() {
-  const cart = await retrieveCart()
+export default async function Checkout({
+  params, searchParams,
+}: {
+  params: Promise<{ countryCode: string }>
+  searchParams: Promise<{ step?: string }>
+}) {
+  const [{ countryCode }, query, cart] = await Promise.all([params, searchParams, retrieveCart()])
+  if (!cart?.items?.length) notFound()
 
-  if (!cart) {
-    return notFound()
+  if (!query.step) {
+    const step = !cart.email || !cart.shipping_address?.address_1
+      ? "address"
+      : !cart.shipping_methods?.length
+        ? "delivery"
+        : !cart.payment_collection?.payment_sessions?.length
+          ? "payment"
+          : "review"
+    redirect(`/${countryCode}/checkout?step=${step}`)
   }
 
   const customer = await retrieveCustomer()
-
   return (
-    <div className="grid grid-cols-1 small:grid-cols-[1fr_416px] content-container gap-x-40 py-12">
-      <PaymentWrapper cart={cart}>
-        <CheckoutForm cart={cart} customer={customer} />
-      </PaymentWrapper>
-      <CheckoutSummary cart={cart} />
-    </div>
+    <main className="content-container py-10 small:py-16">
+      <h1 className="mb-6 font-serif text-4xl text-semantic-text-primary">Checkout</h1>
+      <CheckoutProgress />
+      <div className="grid grid-cols-1 gap-10 small:grid-cols-[minmax(0,1fr)_360px] small:gap-12">
+        <PaymentWrapper cart={cart}>
+          <CheckoutForm cart={cart} customer={customer} />
+        </PaymentWrapper>
+        <CheckoutSummary cart={cart} />
+      </div>
+    </main>
   )
 }

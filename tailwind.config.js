@@ -39,7 +39,7 @@ module.exports = {
           },
           text: {
             primary: "#1C1A17",
-            muted: "#4B5563",
+            muted: "#6B6257",
             accent: "#685640",
             inverse: "#FAF7F2",
             error: "#B42318",

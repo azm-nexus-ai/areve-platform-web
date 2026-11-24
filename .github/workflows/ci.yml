@@ -6,8 +6,10 @@ on:
     branches: [main, develop]
 
 jobs:
-  typecheck:
+  checks:
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: pk_ci_static_checks_only
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -15,12 +17,17 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm test
+      - run: npm run lint
       - run: npm run typecheck
 
   build:
     runs-on: ubuntu-latest
     env:
-      HAS_BACKEND: ${{ secrets.MEDUSA_BACKEND_URL != '' }}
+      MEDUSA_BACKEND_URL: ${{ secrets.MEDUSA_BACKEND_URL }}
+      NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${{ secrets.MEDUSA_PUBLISHABLE_KEY }}
+      NEXT_PUBLIC_BASE_URL: http://localhost:8000
+      NEXT_PUBLIC_DEFAULT_REGION: ng
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -28,13 +35,12 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      # The build pre-renders pages from the API, so it needs a reachable backend.
-      # Add these as repository secrets once staging is up (Khalifa).
+      - name: Require staging build configuration
+        run: |
+          if [ -z "$MEDUSA_BACKEND_URL" ] || [ -z "$NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY" ]; then
+            echo "::error::Configure MEDUSA_BACKEND_URL and MEDUSA_PUBLISHABLE_KEY repository secrets. A skipped build is not a verified release."
+            exit 1
+          fi
+      # Pre-render against the reachable staging API, never production data.
       - name: Build
-        if: env.HAS_BACKEND == 'true'
-        env:
-          MEDUSA_BACKEND_URL: ${{ secrets.MEDUSA_BACKEND_URL }}
-          NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${{ secrets.MEDUSA_PUBLISHABLE_KEY }}
-          NEXT_PUBLIC_BASE_URL: http://localhost:8000
-          NEXT_PUBLIC_DEFAULT_REGION: ng
         run: npm run build
