@@ -26,7 +26,7 @@
     "@stripe/react-stripe-js": "^5.3.0",
     "@stripe/stripe-js": "^8.2.0",
     "lodash": "^4.17.21",
-    "next": "15.3.9",
+    "next": "15.5.29",
     "pg": "^8.11.3",
     "qs": "^6.12.1",
     "react": "19.0.5",
@@ -52,8 +52,8 @@
     "autoprefixer": "^10.4.2",
     "babel-loader": "^8.2.3",
     "eslint": "8.57.1",
-    "eslint-config-next": "15.0.8",
-    "postcss": "^8.4.8",
+    "eslint-config-next": "15.5.29",
+    "postcss": "8.5.33",
     "prettier": "^2.8.8",
     "tailwindcss": "^3.0.23",
     "typescript": "^5.3.2"
@@ -64,7 +64,9 @@
   },
   "overrides": {
     "react": "19.0.5",
-    "react-dom": "19.0.5"
+    "react-dom": "19.0.5",
+    "postcss": "8.5.33",
+    "sharp": "0.35.5"
   },
   "engines": {
     "node": "22.x"
