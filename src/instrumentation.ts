@@ -22,8 +22,6 @@ export const onRequestError: Instrumentation.onRequestError = async (
   await agent?.captureException(error, {
     metadata: {
       method: request.method,
-      path: request.path,
-      route: context.routePath,
       route_type: context.routeType,
     },
   })
