@@ -11,7 +11,7 @@ import ErrorMessage from "@modules/checkout/components/error-message"
 import Divider from "@modules/common/components/divider"
 import MedusaRadio from "@modules/common/components/radio"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 const PICKUP_OPTION_ON = "__PICKUP_ON"
 const PICKUP_OPTION_OFF = "__PICKUP_OFF"
@@ -80,41 +80,41 @@ const Shipping: React.FC<ShippingProps> = ({
 
   const isOpen = searchParams.get("step") === "delivery"
 
-  const _shippingMethods = availableShippingMethods?.filter(
+  const _shippingMethods = useMemo(() => availableShippingMethods?.filter(
     (sm) => sm.service_zone?.fulfillment_set?.type !== "pickup"
-  )
+  ) ?? [], [availableShippingMethods])
 
-  const _pickupMethods = availableShippingMethods?.filter(
+  const _pickupMethods = useMemo(() => availableShippingMethods?.filter(
     (sm) => sm.service_zone?.fulfillment_set?.type === "pickup"
-  )
+  ) ?? [], [availableShippingMethods])
 
   const hasPickupOptions = !!_pickupMethods?.length
 
   useEffect(() => {
-    setIsLoadingPrices(true)
-
-    if (_shippingMethods?.length) {
-      const promises = _shippingMethods
-        .filter((sm) => sm.price_type === "calculated")
-        .map((sm) => calculatePriceForShippingOption(sm.id, cart.id))
-
-      if (promises.length) {
-        Promise.allSettled(promises).then((res) => {
-          const pricesMap: Record<string, number> = {}
-          res
-            .filter((r) => r.status === "fulfilled")
-            .forEach((p) => (pricesMap[p.value?.id || ""] = p.value?.amount!))
-
-          setCalculatedPricesMap(pricesMap)
+    let active = true
+    const calculatedMethods = _shippingMethods.filter((sm) => sm.price_type === "calculated")
+    setCalculatedPricesMap({})
+    setIsLoadingPrices(calculatedMethods.length > 0)
+    if (calculatedMethods.length) {
+      Promise.allSettled(calculatedMethods.map((sm) => calculatePriceForShippingOption(sm.id, cart.id)))
+        .then((results) => {
+          if (!active) return
+          const prices: Record<string, number> = {}
+          for (const result of results) {
+            if (result.status === "fulfilled" && result.value?.id && typeof result.value.amount === "number" && Number.isFinite(result.value.amount)) {
+              prices[result.value.id] = result.value.amount
+            }
+          }
+          setCalculatedPricesMap(prices)
           setIsLoadingPrices(false)
         })
-      }
     }
+    return () => { active = false }
+  }, [_shippingMethods, cart.id])
 
-    if (_pickupMethods?.find((m) => m.id === shippingMethodId)) {
-      setShowPickupOptions(PICKUP_OPTION_ON)
-    }
-  }, [availableShippingMethods])
+  useEffect(() => {
+    setShowPickupOptions(_pickupMethods.some((m) => m.id === shippingMethodId) ? PICKUP_OPTION_ON : PICKUP_OPTION_OFF)
+  }, [_pickupMethods, shippingMethodId])
 
   const handleEdit = () => {
     router.push(pathname + "?step=delivery", { scroll: false })

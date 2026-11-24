@@ -49,9 +49,18 @@ type ApiConfig = Partial<Omit<AreveConfig, "content">> & {
   } | null
 }
 
-const safeLink = (value: unknown): value is string =>
-  typeof value === "string" &&
-  (/^\/(?!\/)[^\s]*$/.test(value) || /^https:\/\/[^\s]+$/.test(value))
+// Keep the same URL contract as the API; old content must also be safe to render.
+const safeLink = (value: unknown, externalOnly = false): value is string => {
+  if (typeof value !== "string" || /[\s\\\u0000-\u001f\u007f]/.test(value) || /%(?:00|0a|0d|5c)/i.test(value)) return false
+  const local = value.startsWith("/") && !value.startsWith("//")
+  if ((!local || externalOnly) && !/^https:\/\/[^/]/.test(value)) return false
+  try {
+    const url = new URL(value, "https://areve.invalid")
+    return url.protocol === "https:" && !!url.hostname && !url.username && !url.password && (!local || url.origin === "https://areve.invalid")
+  } catch {
+    return false
+  }
+}
 
 export function resolveStorefrontContent(input: ApiConfig["content"]): StorefrontContent {
   const announcement = input?.announcement
@@ -70,7 +79,7 @@ export function resolveStorefrontContent(input: ApiConfig["content"]): Storefron
       cta_label: typeof hero?.cta_label === "string" && hero.cta_label.trim()
         ? hero.cta_label : DEFAULT_STOREFRONT_CONTENT.hero.cta_label,
       cta_link: safeLink(hero?.cta_link) ? hero.cta_link! : DEFAULT_STOREFRONT_CONTENT.hero.cta_link,
-      image_url: typeof hero?.image_url === "string" && /^https:\/\/[^\s]+$/.test(hero.image_url)
+      image_url: safeLink(hero?.image_url, true)
         ? hero.image_url : null,
     },
   }

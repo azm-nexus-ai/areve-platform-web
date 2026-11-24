@@ -82,3 +82,15 @@ test("rejects unsafe content links and uses defaults", () => {
   assert.equal(config.content.hero.cta_link, "/store")
   assert.equal(config.content.hero.image_url, null)
 })
+
+for (const link of ["//outside.test/path", "/\\outside.test", "https://user:password@outside.test", "https:///outside.test", "https://", "/%0aexample", "https://outside.test\n"]) {
+  test(`rejects unsafe stored link ${JSON.stringify(link)}`, () => {
+    const { content } = resolveAreveConfig({ content: {
+      announcement: { enabled: true, text: "Offers", link },
+      hero: { cta_link: link, image_url: link },
+    } })
+    assert.equal(content.announcement.link, null)
+    assert.equal(content.hero.cta_link, "/store")
+    assert.equal(content.hero.image_url, null)
+  })
+}

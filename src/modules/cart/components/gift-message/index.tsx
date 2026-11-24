@@ -27,7 +27,7 @@ export default function GiftMessage({ initialValue = "" }: Props) {
   return (
     <section aria-labelledby="gift-message-heading" className="border border-semantic-border-subtle bg-semantic-surface-canvas p-5">
       <h2 id="gift-message-heading" className="font-serif text-2xl text-semantic-text-primary">Add a gift message</h2>
-      <p className="mt-2 text-sm leading-6 text-semantic-text-muted">Optional. We'll include your message with your order.</p>
+      <p className="mt-2 text-sm leading-6 text-semantic-text-muted">Optional. We’ll include your message with your order.</p>
       <label htmlFor="gift-message" className="mt-4 block text-sm font-semibold text-semantic-text-primary">Your message</label>
       <textarea
         id="gift-message"
