@@ -1,3 +1,4 @@
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { login } from "@lib/data/customer"
 import { LOGIN_VIEW } from "@modules/account/templates/login-template"
 import ErrorMessage from "@modules/checkout/components/error-message"
@@ -46,6 +47,7 @@ const Login = ({ setCurrentView }: Props) => {
           Sign in
         </SubmitButton>
       </form>
+      <LocalizedClientLink href="/forgot-password" className="mt-4 inline-flex min-h-11 items-center underline">Forgot your password?</LocalizedClientLink>
       <span className="text-center text-ui-fg-base text-small-regular mt-6">
         Not a member?{" "}
         <button

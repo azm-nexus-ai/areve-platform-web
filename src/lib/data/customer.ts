@@ -3,11 +3,10 @@
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
-import { revalidateTag } from "next/cache"
+import { revalidatePath, revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
 import {
   getAuthHeaders,
-  getCacheOptions,
   getCacheTag,
   getCartId,
   removeAuthToken,
@@ -15,18 +14,22 @@ import {
   setAuthToken,
 } from "./cookies"
 
+async function revalidateCustomerViews() {
+  const tag = await getCacheTag("customers")
+  if (tag) revalidateTag(tag)
+  // Customer reads are deliberately uncached. Invalidate the account route tree
+  // as well so mutations replace prefetched layouts and address lists.
+  revalidatePath("/[countryCode]/(main)/account", "layout")
+}
+
 export const retrieveCustomer =
   async (): Promise<HttpTypes.StoreCustomer | null> => {
     const authHeaders = await getAuthHeaders()
 
-    if (!authHeaders) return null
+    if (!("authorization" in authHeaders)) return null
 
     const headers = {
       ...authHeaders,
-    }
-
-    const next = {
-      ...(await getCacheOptions("customers")),
     }
 
     return await sdk.client
@@ -36,8 +39,7 @@ export const retrieveCustomer =
           fields: "*orders",
         },
         headers,
-        next,
-        cache: "force-cache",
+        cache: "no-store",
       })
       .then(({ customer }) => customer)
       .catch(() => null)
@@ -53,10 +55,32 @@ export const updateCustomer = async (body: HttpTypes.StoreUpdateCustomer) => {
     .then(({ customer }) => customer)
     .catch(medusaError)
 
-  const cacheTag = await getCacheTag("customers")
-  revalidateTag(cacheTag)
+  await revalidateCustomerViews()
 
   return updateRes
+}
+
+export async function updateCustomerName(_previous: unknown, form: FormData) {
+  try {
+    await updateCustomer({ first_name: String(form.get("first_name") ?? ""), last_name: String(form.get("last_name") ?? "") })
+    return { success: true, error: null }
+  } catch {
+    return { success: false, error: "Unable to update your name. Please try again." }
+  }
+}
+
+export async function updateCustomerPhone(_previous: unknown, form: FormData) {
+  try {
+    await updateCustomer({ phone: String(form.get("phone") ?? "") })
+    return { success: true, error: null }
+  } catch {
+    return { success: false, error: "Unable to update your phone number. Please try again." }
+  }
+}
+
+export async function saveCustomerBillingAddress(_previous: unknown, form: FormData) {
+  const state = { isDefaultBilling: true, isDefaultShipping: false }
+  return form.get("addressId") ? updateCustomerAddress(state, form) : addCustomerAddress(state, form)
 }
 
 export async function signup(_currentState: unknown, formData: FormData) {
@@ -93,14 +117,14 @@ export async function signup(_currentState: unknown, formData: FormData) {
 
     await setAuthToken(loginToken as string)
 
-    const customerCacheTag = await getCacheTag("customers")
-    revalidateTag(customerCacheTag)
+    await revalidateCustomerViews()
 
     await transferCart()
 
-    return createdCustomer
-  } catch (error: any) {
-    return error.toString()
+    return null
+  } catch {
+    await removeAuthToken()
+    return "Unable to create your account. If you already registered, sign in or reset your password."
   }
 }
 
@@ -113,34 +137,36 @@ export async function login(_currentState: unknown, formData: FormData) {
       .login("customer", "emailpass", { email, password })
       .then(async (token) => {
         await setAuthToken(token as string)
-        const customerCacheTag = await getCacheTag("customers")
-        revalidateTag(customerCacheTag)
+        await revalidateCustomerViews()
       })
-  } catch (error: any) {
-    return error.toString()
+  } catch {
+    return "Unable to sign in. Check your email and password and try again."
   }
 
   try {
     await transferCart()
-  } catch (error: any) {
-    return error.toString()
+  } catch {
+    return "You are signed in, but your cart could not be restored. Please refresh your cart."
   }
 }
 
 export async function signout(countryCode: string) {
-  await sdk.auth.logout()
-
+  try {
+    await sdk.auth.logout()
+  } catch {
+    // Local credentials must still be removed when an expired session or outage
+    // prevents the optional backend session logout.
+  }
   await removeAuthToken()
 
-  const customerCacheTag = await getCacheTag("customers")
-  revalidateTag(customerCacheTag)
+  await revalidateCustomerViews()
 
   await removeCartId()
 
   const cartCacheTag = await getCacheTag("carts")
   revalidateTag(cartCacheTag)
 
-  redirect(`/${countryCode}/account`)
+  redirect(`/${/^[a-z]{2}$/.test(countryCode) ? countryCode : "ng"}/account`)
 }
 
 export async function transferCart() {
@@ -187,31 +213,29 @@ export const addCustomerAddress = async (
   return sdk.store.customer
     .createAddress(address, {}, headers)
     .then(async ({ customer }) => {
-      const customerCacheTag = await getCacheTag("customers")
-      revalidateTag(customerCacheTag)
-      return { success: true, error: null }
+      await revalidateCustomerViews()
+      return { ...currentState, success: true, error: null }
     })
     .catch((err) => {
-      return { success: false, error: err.toString() }
+      return { ...currentState, success: false, error: "Unable to save this address. Check the details and try again." }
     })
 }
 
 export const deleteCustomerAddress = async (
   addressId: string
-): Promise<void> => {
+): Promise<{ success: boolean; error: string | null }> => {
   const headers = {
     ...(await getAuthHeaders()),
   }
 
-  await sdk.store.customer
+  return sdk.store.customer
     .deleteAddress(addressId, headers)
     .then(async () => {
-      const customerCacheTag = await getCacheTag("customers")
-      revalidateTag(customerCacheTag)
+      await revalidateCustomerViews()
       return { success: true, error: null }
     })
     .catch((err) => {
-      return { success: false, error: err.toString() }
+      return { success: false, error: "Unable to remove this address. Please try again." }
     })
 }
 
@@ -251,11 +275,10 @@ export const updateCustomerAddress = async (
   return sdk.store.customer
     .updateAddress(addressId, address, {}, headers)
     .then(async () => {
-      const customerCacheTag = await getCacheTag("customers")
-      revalidateTag(customerCacheTag)
+      await revalidateCustomerViews()
       return { success: true, error: null }
     })
     .catch((err) => {
-      return { success: false, error: err.toString() }
+      return { success: false, error: "Unable to save this address. Check the details and try again." }
     })
 }

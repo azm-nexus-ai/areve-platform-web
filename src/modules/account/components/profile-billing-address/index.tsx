@@ -7,7 +7,7 @@ import NativeSelect from "@modules/common/components/native-select"
 
 import AccountInfo from "../account-info"
 import { HttpTypes } from "@medusajs/types"
-import { addCustomerAddress, updateCustomerAddress } from "@lib/data/customer"
+import { saveCustomerBillingAddress } from "@lib/data/customer"
 
 type MyInformationProps = {
   customer: HttpTypes.StoreCustomer
@@ -49,7 +49,7 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
   }
 
   const [state, formAction] = useActionState(
-    billingAddress ? updateCustomerAddress : addCustomerAddress,
+    saveCustomerBillingAddress,
     initialState
   )
 
@@ -168,6 +168,7 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
             data-testid="billing-province-input"
           />
           <NativeSelect
+            aria-label="Country"
             name="country_code"
             defaultValue={billingAddress?.country_code || undefined}
             required

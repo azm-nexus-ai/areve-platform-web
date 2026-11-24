@@ -1,70 +1,12 @@
 "use client"
 
-import React, { useEffect, useActionState } from "react"
-import Input from "@modules/common/components/input"
-import AccountInfo from "../account-info"
-import { HttpTypes } from "@medusajs/types"
-import { toast } from "@medusajs/ui"
+import type { HttpTypes } from "@medusajs/types"
+import { RequestPasswordReset } from "../password-recovery"
 
-type MyInformationProps = {
-  customer: HttpTypes.StoreCustomer
+export default function ProfilePassword({ customer }: { customer: HttpTypes.StoreCustomer }) {
+  return <section aria-labelledby="account-password-heading" className="py-5 space-y-4" data-testid="account-password-editor">
+    <h2 id="account-password-heading" className="text-lg font-semibold">Password</h2>
+    <p className="text-sm">Confirm access to your email before choosing a new password.</p>
+    <RequestPasswordReset email={customer.email} />
+  </section>
 }
-
-const ProfilePassword: React.FC<MyInformationProps> = ({ customer }) => {
-  const [successState, setSuccessState] = React.useState(false)
-
-  // TODO: Add support for password updates
-  const updatePassword = async () => {
-    toast.info("Password update is not implemented")
-  }
-
-  const clearState = () => {
-    setSuccessState(false)
-  }
-
-  return (
-    <form
-      action={updatePassword}
-      onReset={() => clearState()}
-      className="w-full"
-    >
-      <AccountInfo
-        label="Password"
-        currentInfo={
-          <span>The password is not shown for security reasons</span>
-        }
-        isSuccess={successState}
-        isError={false}
-        errorMessage={undefined}
-        clearState={clearState}
-        data-testid="account-password-editor"
-      >
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            label="Old password"
-            name="old_password"
-            required
-            type="password"
-            data-testid="old-password-input"
-          />
-          <Input
-            label="New password"
-            type="password"
-            name="new_password"
-            required
-            data-testid="new-password-input"
-          />
-          <Input
-            label="Confirm password"
-            type="password"
-            name="confirm_password"
-            required
-            data-testid="confirm-password-input"
-          />
-        </div>
-      </AccountInfo>
-    </form>
-  )
-}
-
-export default ProfilePassword

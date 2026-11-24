@@ -21,7 +21,7 @@ const Register = ({ setCurrentView }: Props) => {
       data-testid="register-page"
     >
       <h1 className="text-large-semi uppercase mb-6">
-        Become a AREVÉ Member
+        Create your AREVÉ account
       </h1>
       <p className="text-center text-base-regular text-ui-fg-base mb-4">
         Create your AREVÉ Member profile, and get access to an enhanced
@@ -64,21 +64,24 @@ const Register = ({ setCurrentView }: Props) => {
             required
             type="password"
             autoComplete="new-password"
+            minLength={12}
+            maxLength={128}
             data-testid="password-input"
           />
         </div>
+        <p className="mt-2 text-sm">Use a unique password of 12–128 characters.</p>
         <ErrorMessage error={message} data-testid="register-error" />
         <span className="text-center text-ui-fg-base text-small-regular mt-6">
           By creating an account, you agree to AREVÉ&apos;s{" "}
           <LocalizedClientLink
-            href="/content/privacy-policy"
+            href="/privacy"
             className="underline"
           >
             Privacy Policy
           </LocalizedClientLink>{" "}
           and{" "}
           <LocalizedClientLink
-            href="/content/terms-of-use"
+            href="/terms"
             className="underline"
           >
             Terms of Use

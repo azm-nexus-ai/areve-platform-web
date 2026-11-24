@@ -28,6 +28,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
   isActive = false,
 }) => {
   const [removing, setRemoving] = useState(false)
+  const [removeError, setRemoveError] = useState<string | null>(null)
   const [successState, setSuccessState] = useState(false)
   const { state, open, close: closeModal } = useToggleState(false)
 
@@ -56,9 +57,17 @@ const EditAddress: React.FC<EditAddressProps> = ({
   }, [formState])
 
   const removeAddress = async () => {
+    if (removing) return
     setRemoving(true)
-    await deleteCustomerAddress(address.id)
-    setRemoving(false)
+    setRemoveError(null)
+    try {
+      const result = await deleteCustomerAddress(address.id)
+      if (!result.success) setRemoveError(result.error)
+    } catch {
+      setRemoveError("Unable to remove this address. Please try again.")
+    } finally {
+      setRemoving(false)
+    }
   }
 
   return (
@@ -113,12 +122,15 @@ const EditAddress: React.FC<EditAddressProps> = ({
           <button
             className="text-small-regular text-ui-fg-base flex items-center gap-x-2"
             onClick={removeAddress}
+            disabled={removing}
+            aria-busy={removing}
             data-testid="address-delete-button"
           >
             {removing ? <Spinner /> : <Trash />}
             Remove
           </button>
         </div>
+        {removeError && <p role="alert" className="mt-3 text-sm text-semantic-text-error">{removeError}</p>}
       </div>
 
       <Modal isOpen={state} close={close} data-testid="edit-address-modal">
@@ -211,7 +223,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
               />
             </div>
             {formState.error && (
-              <div className="text-rose-500 text-small-regular py-2">
+              <div role="alert" className="text-rose-500 text-small-regular py-2">
                 {formState.error}
               </div>
             )}
