@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
+import { cataloguePage, catalogueSort } from "@lib/util/catalogue-query"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -8,19 +9,17 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { HttpTypes } from "@medusajs/types"
 
 export default function CategoryTemplate({
-  category, sortBy, page, countryCode, minPrice, maxPrice, filterCategoryId,
+  category, sortBy, page, countryCode, filterCategoryId,
 }: {
   category: HttpTypes.StoreProductCategory
   sortBy?: SortOptions
   page?: string
   countryCode: string
-  minPrice?: string
-  maxPrice?: string
   filterCategoryId?: string
 }) {
   if (!category || !countryCode) notFound()
-  const sort = sortBy || "created_at"
-  const pageNumber = Math.max(1, Number.parseInt(page || "1", 10) || 1)
+  const sort = catalogueSort(sortBy)
+  const pageNumber = cataloguePage(page)
   const parents: HttpTypes.StoreProductCategory[] = []
   let parent = category.parent_category
   while (parent) { parents.unshift(parent); parent = parent.parent_category }
@@ -39,8 +38,6 @@ export default function CategoryTemplate({
       <div className="mt-10 flex flex-col gap-8 small:flex-row small:items-start">
         <RefinementList
           sortBy={sort}
-          minPrice={minPrice}
-          maxPrice={maxPrice}
           categoryId={allowedFilter}
           categoryOptions={childCategories.map((c) => ({ id: c.id, name: c.name }))}
           data-testid="sort-by-container"
@@ -52,9 +49,7 @@ export default function CategoryTemplate({
               page={pageNumber}
               categoryId={allowedFilter || category.id}
               countryCode={countryCode}
-              minPrice={minPrice}
-              maxPrice={maxPrice}
-            />
+                    />
           </Suspense>
         </div>
       </div>

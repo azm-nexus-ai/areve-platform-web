@@ -2,8 +2,8 @@
   "name": "areve-platform-web",
   "version": "0.1.0",
   "private": true,
-  "author": "AREV\u00c9",
-  "description": "AREV\u00c9 Online Shop \u2014 storefront (Next.js + Medusa)",
+  "author": "AREVÉ",
+  "description": "AREVÉ Online Shop — storefront (Next.js + Medusa)",
   "scripts": {
     "dev": "next dev --turbopack -p 8000",
     "build": "next build",
@@ -37,6 +37,7 @@
     "webpack": "^5"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
     "@babel/core": "^7.17.5",
     "@medusajs/types": "latest",
     "@medusajs/ui-preset": "latest",

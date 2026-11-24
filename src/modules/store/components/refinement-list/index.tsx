@@ -1,20 +1,17 @@
 "use client"
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
-import { FormEvent } from "react"
 import { SortOptions } from "./sort-products"
 
 type Props = {
   sortBy: SortOptions
-  minPrice?: string
-  maxPrice?: string
   categoryId?: string
   categoryOptions?: { id: string; name: string }[]
   "data-testid"?: string
 }
 
 export default function RefinementList({
-  sortBy, minPrice = "", maxPrice = "", categoryId = "", categoryOptions = [],
+  sortBy, categoryId = "", categoryOptions = [],
   "data-testid": dataTestId,
 }: Props) {
   const router = useRouter()
@@ -28,15 +25,9 @@ export default function RefinementList({
       else params.delete(key)
     })
     params.delete("page")
+    params.delete("minPrice")
+    params.delete("maxPrice")
     router.push(`${pathname}?${params.toString()}`)
-  }
-
-  const applyPrice = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const form = new FormData(event.currentTarget)
-    const min = String(form.get("minPrice") || "")
-    const max = String(form.get("maxPrice") || "")
-    update({ minPrice: min, maxPrice: max })
   }
 
   return (
@@ -51,8 +42,7 @@ export default function RefinementList({
             className="min-h-11 w-full border border-semantic-border-strong bg-transparent px-2 text-sm text-semantic-text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-semantic-focus"
           >
             <option value="created_at">Newest</option>
-            <option value="price_asc">Price: low to high</option>
-            <option value="price_desc">Price: high to low</option>
+            <option value="title">Name: A to Z</option>
           </select>
         </div>
 
@@ -71,24 +61,7 @@ export default function RefinementList({
           </div>
         )}
 
-        <form key={`${minPrice}-${maxPrice}`} onSubmit={applyPrice}>
-          <p className="mb-2 text-sm font-semibold text-semantic-text-primary">Price (NGN)</p>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label htmlFor="catalogue-min" className="mb-1 block text-xs text-semantic-text-muted">From</label>
-              <input id="catalogue-min" name="minPrice" type="number" min="0" step="1" placeholder="0" defaultValue={minPrice}
-                className="min-h-11 w-full border border-semantic-border-strong bg-transparent px-2 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-semantic-focus" />
-            </div>
-            <div>
-              <label htmlFor="catalogue-max" className="mb-1 block text-xs text-semantic-text-muted">To</label>
-              <input id="catalogue-max" name="maxPrice" type="number" min="0" step="1" placeholder="Any" defaultValue={maxPrice}
-                className="min-h-11 w-full border border-semantic-border-strong bg-transparent px-2 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-semantic-focus" />
-            </div>
-          </div>
-          <button type="submit" className="mt-3 inline-flex min-h-11 w-full items-center justify-center bg-semantic-action-primary px-3 text-sm font-semibold text-semantic-action-primaryText">
-            Apply price
-          </button>
-        </form>
+
       </div>
     </aside>
   )

@@ -29,8 +29,8 @@ export default function ProductCard({ product, isFeatured }: ProductCardProps) {
           sizes="(max-width: 1023px) 50vw, 25vw"
           className="!aspect-[4/5] rounded-none bg-semantic-surface-muted shadow-none transition-opacity duration-200 group-hover:opacity-90"
         />
-        <div className="mt-3 flex items-start justify-between gap-3">
-          <Text className="font-serif text-lg leading-6 text-semantic-text-primary" data-testid="product-title">
+        <div className="mt-3 flex min-w-0 flex-col items-start gap-1">
+          <Text className="break-words font-serif text-lg leading-6 text-semantic-text-primary" data-testid="product-title">
             {product.title}
           </Text>
           <div className="shrink-0 text-sm text-semantic-text-primary">

@@ -1,22 +1,13 @@
-export default function medusaError(error: any): never {
-  if (error.response) {
-    // The request was made and the server responded with a status code
-    // that falls out of the range of 2xx
-    const u = new URL(error.config.url, error.config.baseURL)
-    console.error("Resource:", u.toString())
-    console.error("Response data:", error.response.data)
-    console.error("Status code:", error.response.status)
-    console.error("Headers:", error.response.headers)
-
-    // Extracting the error message from the response data
-    const message = error.response.data.message || error.response.data
-
-    throw new Error(message.charAt(0).toUpperCase() + message.slice(1) + ".")
-  } else if (error.request) {
-    // The request was made but no response was received
-    throw new Error("No response received: " + error.request)
-  } else {
-    // Something happened in setting up the request that triggered an Error
-    throw new Error("Error setting up the request: " + error.message)
-  }
+/** Do not expose transport objects, response bodies, headers or provider messages
+ * through server-action errors. They may contain customer data or credentials.
+ */
+export default function medusaError(error: unknown): never {
+  const value = error as { status?: number; response?: { status?: number } } | null
+  const status = value?.status ?? value?.response?.status
+  if (status === 401) throw new Error("Please sign in again to continue.")
+  if (status === 403) throw new Error("This action is not available for your account.")
+  if (status === 404) throw new Error("This item is no longer available. Please refresh and try again.")
+  if (status === 409) throw new Error("This item has changed. Please refresh and try again.")
+  if (status === 400 || status === 422) throw new Error("Please check your details and try again.")
+  throw new Error("The shop is temporarily unavailable. Please try again shortly.")
 }

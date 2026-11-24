@@ -15,7 +15,7 @@ Owner: Fawwaz Sanni Ola Dotun · Backend: [areve-platform-api](../areve-platform
   Paystack returns them to `/ng/checkout/paystack/callback`, which completes the order
 - WhatsApp click-to-chat link in the footer (`NEXT_PUBLIC_WHATSAPP_NUMBER`)
 - **LAWDE Shield monitoring**: server-side rendering, route-handler and server-action errors are reported via `src/instrumentation.ts` when `LAWDE_API_KEY` is set (browser capture to follow)
-- CI: install, plus build once the staging API secrets are added
+- CI: unit tests, lint, typecheck and production build; missing staging build configuration fails explicitly.
 
 ## Run locally
 
@@ -30,20 +30,17 @@ npm run dev                   # http://localhost:8000
 ## Deploy on Vercel
 
 1. Vercel → Add New Project → import `azm-nexus-ai/areve-platform-web` (framework: Next.js, defaults are fine).
-2. Environment variables: `MEDUSA_BACKEND_URL` (the Railway API URL), `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`, `NEXT_PUBLIC_BASE_URL` (the Vercel URL), `NEXT_PUBLIC_DEFAULT_REGION=ng`, `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY`, `REVALIDATE_SECRET`, `LAWDE_API_KEY`, `LAWDE_APP_ID`, `LAWDE_ENVIRONMENT=production` (or `staging`).
+2. Environment variables: `MEDUSA_BACKEND_URL` (the Railway API URL), `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY`, `NEXT_PUBLIC_BASE_URL` (the Vercel URL), `NEXT_PUBLIC_DEFAULT_REGION=ng`, `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY`, `REVALIDATE_SECRET`, `LAWDE_API_KEY`, `LAWDE_APP_ID`, `LAWDE_ENVIRONMENT=production` (or `staging`), and `NEXT_PUBLIC_R2_PUBLIC_URL` for the public image origin.
 3. Add the Vercel URL to the API's `STORE_CORS`, and set the Paystack callback URL to `<vercel-url>/ng/checkout/paystack/callback`.
 4. The API must be live before the first Vercel build, because pages are pre-rendered from it.
 
 Shop settings such as the WhatsApp number come from the API (`GET /store/areve/config`); `NEXT_PUBLIC_WHATSAPP_NUMBER` is only a fallback.
 
-## Next tasks (Phase 1)
+## MVP release gates
 
-- [ ] Design system pass from the AREVÉ brand (typography scale, buttons, product cards)
-- [ ] Home page sections: featured collections, gifting, brand story
-- [ ] Mobile performance (Lighthouse 85+), image optimisation
-- [ ] Delivery, returns, privacy and terms pages
-- [ ] Remove Stripe/PayPal code paths once Paystack is confirmed
-- [ ] Fix upstream type errors so `tsc --noEmit` passes (build currently ignores them, as in the starter)
+Browse/search uses complete server pagination. Global price-range filtering and price sorting are deferred until supported by the backend. See [storefront quality evidence](docs-storefront-quality.md).
+
+Open gates: approved policies, delivery areas/rates, real catalogue/images, hosted Paystack/email/R2/Redis validation, dependency security review and representative mobile performance. Typecheck, lint, tests and builds currently pass locally.
 
 ## Checkout regression tests
 
