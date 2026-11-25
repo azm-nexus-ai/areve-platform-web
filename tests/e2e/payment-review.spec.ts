@@ -71,3 +71,47 @@ test("Finance sees provider truth with no money-changing controls", async ({ pag
   await expect(page.getByRole("button", { name: /approve|check .* status|review refund/i })).toHaveCount(0)
   await expect(page.getByText("This does not confirm arrival in the customer’s bank account.", { exact: false })).toBeVisible()
 })
+
+test("Owner resolves a failed reservation and imports a dashboard refund with safe retry", async ({ page }) => {
+  const base = await login(page)
+  let released = false
+  let imported = false
+  const imports: Record<string, unknown>[] = []
+  await page.route(`${base}/admin/areve/payments**`, async route => {
+    const path = new URL(route.request().url()).pathname
+    if (route.request().method() === "GET") return route.fulfill({ json: { ...fixture, refunds_count: imported ? 2 : 1, refunds: [
+      { id: "arfi_failed", reference: "arfr_failed", provider_id: "900", source: "console", transaction_reference: "arv_synthetic_reference", amount_kobo: 25050, state: "failed", accounting_state: "waiting", reason: "Synthetic failed refund", reservation_released_at: released ? "2026-11-25T00:00:00Z" : null, release_reason: released ? "Verified provider failure" : null },
+      ...(imported ? [{ id: "arfi_imported", reference: "arfr_external_test_989", provider_id: "989", source: "external", transaction_reference: "arv_synthetic_reference", amount_kobo: 25050, state: "processed", accounting_state: "complete", reason: "Reviewed existing refund" }] : []),
+    ] } })
+    if (path === "/admin/areve/payments/refunds/arfi_failed/release") {
+      expect(route.request().postDataJSON()).toEqual({ confirm: true, reason: "Verified provider failure" })
+      released = true
+      return route.fulfill({ json: { refund: { id: "arfi_failed", reservation_released_at: "2026-11-25T00:00:00Z" } } })
+    }
+    expect(path).toBe("/admin/areve/payments/refunds/import")
+    imports.push(route.request().postDataJSON()); imported = true
+    if (imports.length === 1) return route.fulfill({ status: 503, json: { message: "Synthetic response loss" } })
+    return route.fulfill({ json: { refund: { id: "arfi_imported", state: "processed", accounting_state: "complete" } } })
+  })
+  await page.goto(`${base}/app/payment-review`)
+  await page.getByText("Resolve a verified failed refund", { exact: true }).click()
+  await page.getByLabel("Failure resolution reason").fill("Verified provider failure")
+  await page.getByRole("checkbox", { name: "I have reviewed the failed refund", exact: false }).check()
+  await page.getByRole("button", { name: "Verify failure and release reservation", exact: true }).click()
+  await expect(page.getByRole("status")).toContainText("No replacement was created")
+  await expect(page.getByText("Reservation released after verified failure:", { exact: false })).toBeVisible()
+  await page.getByText("Reconcile an existing Paystack refund", { exact: true }).click()
+  await page.locator("#import-payment").fill("pay_synthetic")
+  await page.getByLabel("Paystack refund ID", { exact: true }).fill("989")
+  await page.getByLabel("Reconciliation reason", { exact: true }).fill("Reviewed existing refund")
+  await page.getByRole("checkbox", { name: "I have reviewed the existing refund", exact: false }).check()
+  await page.getByRole("button", { name: "Import existing refund", exact: true }).click()
+  await expect(page.getByRole("alert")).toContainText("same provider refund ID")
+  await page.getByRole("button", { name: "Import existing refund", exact: true }).click()
+  await expect(page.getByRole("status")).toContainText("No additional money was moved")
+  expect(imports).toHaveLength(2)
+  expect(imports[0]).toEqual(imports[1])
+  await expect(page.getByText("Source: Existing Paystack refund", { exact: false })).toBeVisible()
+  expect((await new AxeBuilder({ page }).include('[data-testid="payment-review"]').analyze()).violations).toEqual([])
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+})
