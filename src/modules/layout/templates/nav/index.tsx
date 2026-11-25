@@ -6,7 +6,6 @@ import { getLocale } from "@lib/data/locale-actions"
 import { getAreveConfig } from "@lib/data/areve"
 import { StoreRegion } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import DeliveryPromiseMessage from "@modules/common/components/delivery-promise-message"
 import CartButton from "@modules/layout/components/cart-button"
 import SearchOverlay from "@modules/layout/components/search-overlay"
 import SideMenu from "@modules/layout/components/side-menu"
@@ -43,6 +42,7 @@ export default async function Nav() {
 
   return (
     <div className="small:sticky small:inset-x-0 small:top-0 small:z-50">
+      <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-areve-ivory focus:p-4">Skip to content</a>
       <div className="bg-semantic-surface-inverse px-4 py-2 text-center text-semantic-text-inverse">
         {announcement.enabled ? (
           announcement.link ? (
@@ -59,7 +59,7 @@ export default async function Nav() {
             <p className="text-sm">{announcement.text}</p>
           )
         ) : (
-          <DeliveryPromiseMessage config={config} className="!text-semantic-text-inverse" />
+          <p className="text-[10px] font-medium uppercase tracking-[0.22em]">Rooted in heritage. Refined for today.</p>
         )}
       </div>
       <div className="sticky inset-x-0 top-0 z-50 small:static">
@@ -73,11 +73,12 @@ export default async function Nav() {
         <nav aria-label="Desktop product navigation" className="hidden border-b border-semantic-border-subtle bg-semantic-surface-canvas small:block">
           <div className="content-container flex min-h-11 items-center justify-center gap-8 overflow-x-auto text-xs font-medium uppercase tracking-[0.08em] text-semantic-text-primary">
             <LocalizedClientLink href="/store" className="whitespace-nowrap hover:text-semantic-text-accent">Shop all</LocalizedClientLink>
-            {topLevelCategories.map((category) => (
+            {topLevelCategories.slice(0,5).map((category) => (
               <LocalizedClientLink key={category.id} href={`/categories/${category.handle}`} className="whitespace-nowrap hover:text-semantic-text-accent">
                 {category.name}
               </LocalizedClientLink>
             ))}
+            <LocalizedClientLink href="/world" className="whitespace-nowrap text-areve-walnut hover:underline underline-offset-4">The world of AREVÉ</LocalizedClientLink>
           </div>
         </nav>
       )}

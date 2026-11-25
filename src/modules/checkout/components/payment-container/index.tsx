@@ -32,11 +32,12 @@ const PaymentContainer: React.FC<PaymentContainerProps> = ({
     <RadioGroupOption
       key={paymentProviderId}
       value={paymentProviderId}
+      aria-label={paymentInfoMap[paymentProviderId]?.title || "Payment option"}
       disabled={disabled}
       className={clx(
-        "flex flex-col gap-y-2 text-small-regular cursor-pointer py-4 border rounded-rounded px-8 mb-2 hover:shadow-borders-interactive-with-active",
+        "flex flex-col gap-y-2 text-small-regular cursor-pointer py-4 border px-4 mb-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-areve-walnut",
         {
-          "border-ui-border-interactive":
+          "border-areve-walnut":
             selectedPaymentOptionId === paymentProviderId,
         }
       )}

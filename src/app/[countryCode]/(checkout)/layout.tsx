@@ -1,5 +1,6 @@
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import ChevronDown from "@modules/common/icons/chevron-down"
+import BrandMark from "@modules/common/components/brand-mark"
 
 export default function CheckoutLayout({
   children,
@@ -7,8 +8,8 @@ export default function CheckoutLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="w-full bg-white relative small:min-h-screen">
-      <div className="h-16 bg-white border-b ">
+    <div className="w-full bg-areve-ivory relative small:min-h-screen">
+      <div className="h-20 bg-areve-ivory border-b border-areve-sand">
         <nav className="flex h-full items-center content-container justify-between">
           <LocalizedClientLink
             href="/cart"
@@ -25,10 +26,10 @@ export default function CheckoutLayout({
           </LocalizedClientLink>
           <LocalizedClientLink
             href="/"
-            className="font-serif text-2xl tracking-[0.35em] text-areve-ink hover:text-areve-bronze uppercase"
+            className="inline-flex min-h-11 items-center"
             data-testid="store-link"
           >
-            AREVÉ
+            <BrandMark />
           </LocalizedClientLink>
           <div className="flex-1 basis-0" />
         </nav>

@@ -14,7 +14,7 @@ export default async function CartTemplate({ cart, customer, paymentSessionMissi
   const initialMessage = typeof cart?.metadata?.gift_message === "string" ? cart.metadata.gift_message : ""
 
   return (
-    <main className="content-container py-10 small:py-16" data-testid="cart-container">
+    <main id="main-content" className="content-container py-10 small:py-16" data-testid="cart-container">
       <h1 className="mb-8 font-serif text-4xl text-semantic-text-primary">Your cart</h1>
       {paymentSessionMissing && (
         <p role="status" className="mb-6 border border-semantic-border-subtle p-4 text-sm text-semantic-text-primary">

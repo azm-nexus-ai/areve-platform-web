@@ -21,39 +21,42 @@ module.exports = {
         padding: "padding-top padding-right padding-bottom padding-left",
       },
       colors: {
-        // AREVÉ brand tokens (bronze sampled from the logo)
+        // Brand Identity Package v7. Brass is a physical finish, not a digital swatch.
         areve: {
-          bronze: "#685640",
-          ink: "#1C1A17",
-          ivory: "#FAF7F2",
-          sand: "#E9E1D6",
+          bronze: "#604A3A",
+          ink: "#252522",
+          ivory: "#F2EDE3",
+          sand: "#D8C8B0",
+          walnut: "#604A3A",
+          clay: "#A97860",
+          botanical: "#35453B",
         },
         // Semantic aliases keep components independent from palette names.
         // Error is a functional accessibility colour, not a brand extension.
         semantic: {
           surface: {
-            canvas: "#FAF7F2",
+            canvas: "#F2EDE3",
             raised: "#FFFFFF",
-            muted: "#E9E1D6",
-            inverse: "#1C1A17",
+            muted: "#D8C8B0",
+            inverse: "#252522",
           },
           text: {
-            primary: "#1C1A17",
-            muted: "#6B6257",
-            accent: "#685640",
-            inverse: "#FAF7F2",
+            primary: "#252522",
+            muted: "#604A3A",
+            accent: "#604A3A",
+            inverse: "#F2EDE3",
             error: "#B42318",
           },
           action: {
-            primary: "#685640",
-            primaryText: "#FAF7F2",
-            secondary: "#1C1A17",
+            primary: "#252522",
+            primaryText: "#F2EDE3",
+            secondary: "#252522",
           },
           border: {
-            subtle: "#E9E1D6",
-            strong: "#685640",
+            subtle: "#D8C8B0",
+            strong: "#604A3A",
           },
-          focus: "#685640",
+          focus: "#604A3A",
           status: {
             error: "#B42318",
           },
@@ -99,7 +102,6 @@ module.exports = {
         serif: ["var(--font-serif)", "Georgia", "serif"],
         sans: [
           "var(--font-sans)",
-          "Inter",
           "-apple-system",
           "BlinkMacSystemFont",
           "Segoe UI",

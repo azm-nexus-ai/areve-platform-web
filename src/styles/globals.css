@@ -2,9 +2,11 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-:root {
-  --font-serif: "Cormorant Garamond";
-  --font-sans: "Inter Variable";
+@layer base {
+  body { @apply bg-areve-ivory text-areve-ink antialiased; }
+  ::selection { background: #D8C8B0; color: #252522; }
+  :focus-visible { outline: 2px solid #604A3A; outline-offset: 4px; }
+  html { scroll-padding-top: 10rem; }
 }
 
 @layer utilities {
@@ -56,8 +58,12 @@
 
 @layer components {
   .content-container {
-    @apply max-w-[1440px] w-full mx-auto px-6;
+    @apply max-w-[1440px] w-full mx-auto px-6 small:px-12;
   }
+
+  .eyebrow { @apply text-[11px] font-medium uppercase tracking-[0.22em] leading-5; }
+  .brand-button { @apply inline-flex min-h-12 items-center justify-center gap-6 bg-areve-ink px-7 py-4 text-[11px] font-medium uppercase tracking-[0.16em] text-areve-ivory transition-colors hover:bg-areve-walnut disabled:opacity-50; }
+  .brand-link { @apply inline-flex min-h-11 items-center gap-6 border-b border-current py-2 text-[11px] font-medium uppercase tracking-[0.16em]; }
 
   .contrast-btn {
     @apply px-4 py-2 border border-black rounded-full hover:bg-black hover:text-white transition-colors duration-200 ease-in;
