@@ -4,5 +4,5 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 
 export const metadata: Metadata = { title: "Reset your password | AREVÉ", robots: { index: false, follow: false } }
 export default function ForgotPasswordPage() {
-  return <main className="content-container py-12 space-y-6"><h1 className="font-serif text-4xl">Reset your password</h1><RequestPasswordReset /><LocalizedClientLink href="/account" className="inline-block underline">Back to sign in</LocalizedClientLink></main>
+  return <main id="main-content" className="content-container py-12 space-y-6"><h1 className="font-serif text-4xl">Reset your password</h1><RequestPasswordReset /><LocalizedClientLink href="/account" className="inline-block underline">Back to sign in</LocalizedClientLink></main>
 }

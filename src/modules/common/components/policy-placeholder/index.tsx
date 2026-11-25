@@ -8,7 +8,7 @@ export default async function PolicyPlaceholder({ title, subject }: Props) {
   const config = await getAreveConfig()
   const href = whatsAppLink(config.whatsapp_number, `Hello AREVÉ, I have a question about ${subject}.`)
   return (
-    <main className="content-container min-h-[55vh] py-16 small:py-24">
+    <main id="main-content" className="content-container min-h-[55vh] py-16 small:py-24">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-semantic-text-accent">Customer information</p>
       <h1 className="mt-3 font-serif text-4xl text-semantic-text-primary">{title}</h1>
       <p className="mt-6 max-w-xl text-base leading-7 text-semantic-text-muted">

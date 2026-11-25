@@ -18,10 +18,10 @@ export default async function NewIn({ region }: Props) {
     <section className="content-container py-14 small:py-20" aria-labelledby="new-in-heading">
       <div className="mb-8 flex items-end justify-between gap-4">
         <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-semantic-text-accent">The latest edit</p>
-          <h2 id="new-in-heading" className="font-serif text-3xl text-semantic-text-primary small:text-4xl">New In</h2>
+          <p className="mb-2 text-xs font-medium uppercase tracking-[0.2em] text-semantic-text-accent">The latest edit</p>
+          <h2 id="new-in-heading" className="font-serif text-3xl text-semantic-text-primary small:text-[40px]">Objects for everyday rituals</h2>
         </div>
-        <LocalizedClientLink href="/store" className="inline-flex min-h-11 items-center text-sm font-semibold text-semantic-text-accent underline underline-offset-4">
+        <LocalizedClientLink href="/store" className="inline-flex min-h-11 items-center text-sm font-medium text-semantic-text-accent underline underline-offset-4">
           Shop all
         </LocalizedClientLink>
       </div>

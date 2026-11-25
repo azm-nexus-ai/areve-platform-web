@@ -24,7 +24,7 @@ export default async function CollectionTemplate({
   const pageNumber = cataloguePage(page)
 
   return (
-    <main className="content-container py-8 small:py-12">
+    <main id="main-content" className="content-container py-8 small:py-12">
       <nav aria-label="Breadcrumb" className="mb-5 text-sm text-semantic-text-muted">
         <LocalizedClientLink href="/store" className="underline underline-offset-4">Shop</LocalizedClientLink>
         <span aria-current="page"> / {collection.title}</span>

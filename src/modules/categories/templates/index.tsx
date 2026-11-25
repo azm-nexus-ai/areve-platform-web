@@ -27,7 +27,7 @@ export default function CategoryTemplate({
   const allowedFilter = childCategories.some((c) => c.id === filterCategoryId) ? filterCategoryId : undefined
 
   return (
-    <main className="content-container py-8 small:py-12" data-testid="category-container">
+    <main id="main-content" className="content-container py-8 small:py-12" data-testid="category-container">
       <nav aria-label="Breadcrumb" className="mb-5 text-sm text-semantic-text-muted">
         <LocalizedClientLink href="/store" className="underline underline-offset-4">Shop</LocalizedClientLink>
         {parents.map((p) => <span key={p.id}> / <LocalizedClientLink href={`/categories/${p.handle}`} className="underline underline-offset-4">{p.name}</LocalizedClientLink></span>)}

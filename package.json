@@ -15,8 +15,6 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@fontsource-variable/inter": "^5.3.0",
-    "@fontsource/cormorant-garamond": "^5.3.0",
     "@headlessui/react": "^2.2.0",
     "@lawdeshield/agent": "^0.2.0",
     "@medusajs/icons": "latest",

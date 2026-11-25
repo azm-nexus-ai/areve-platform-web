@@ -1,49 +1,29 @@
 import Image from "next/image"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import type { StorefrontContent } from "@lib/util/areve-config"
+import GiftStudy from "../gift-study"
 
-type Props = { content: StorefrontContent["hero"] }
-
-export default function Hero({ content }: Props) {
-  const hasImage = Boolean(content.image_url)
-  const buttonClasses = "inline-flex min-h-11 items-center justify-center bg-semantic-action-primary px-7 py-3 text-xs font-semibold uppercase tracking-[0.15em] text-semantic-action-primaryText transition-colors hover:bg-semantic-surface-inverse focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-semantic-focus"
-
+export default function Hero({ content }: { content: StorefrontContent["hero"] }) {
+  const isDefault = ["Objects for considered living", "Heritage, Refined for Modern Living."].includes(content.headline)
   return (
-    <section aria-label="AREVÉ home introduction" className="relative w-full overflow-hidden bg-areve-sand">
-      <div className="relative flex aspect-[4/5] min-h-[440px] items-center justify-center small:aspect-[16/9] small:min-h-[480px]">
-        {content.image_url ? (
-          <>
-            <Image
-              src={content.image_url}
-              alt=""
-              fill
-              priority
-              unoptimized
-              sizes="100vw"
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-black/40" aria-hidden="true" />
-          </>
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-areve-ivory via-areve-sand to-areve-ivory" aria-hidden="true" />
-        )}
-        <div className="content-container relative z-10 flex w-full flex-col items-center gap-6 px-6 text-center">
-          <p className={`text-xs font-semibold uppercase tracking-[0.25em] ${hasImage ? "text-white" : "text-semantic-text-accent"}`}>AREVÉ</p>
-          <h1 className={`max-w-3xl font-serif text-4xl leading-tight xsmall:text-5xl medium:text-6xl ${hasImage ? "text-white" : "text-semantic-text-primary"}`}>
-            {content.headline}
-          </h1>
-          {content.subheadline && (
-            <p className={`max-w-xl text-base leading-7 small:text-lg ${hasImage ? "text-white" : "text-semantic-text-muted"}`}>
-              {content.subheadline}
-            </p>
-          )}
-          {content.cta_link.startsWith("/") ? (
-            <LocalizedClientLink href={content.cta_link} className={buttonClasses}>{content.cta_label}</LocalizedClientLink>
-          ) : (
-            <a href={content.cta_link} target="_blank" rel="noopener noreferrer" className={buttonClasses}>{content.cta_label}</a>
-          )}
+    <section aria-label="AREVÉ home introduction" className="grid border-b border-semantic-border-subtle small:grid-cols-2">
+      <div className="flex flex-col justify-center px-6 py-10 small:px-12 small:py-16 medium:pl-[max(48px,calc((100vw-1344px)/2))] medium:pr-16">
+        <p className="eyebrow mb-7 text-areve-walnut">Culture, Refined.</p>
+        <h1 className="max-w-xl font-serif text-[42px] font-normal leading-[1.12] tracking-[-0.025em] small:text-[52px] medium:text-[64px]">
+          {isDefault ? <>Heritage, refined<br />for modern living.</> : content.headline}
+        </h1>
+        <p className="mb-9 mt-6 max-w-md text-[15px] font-light leading-7 text-areve-walnut small:text-base">
+          {isDefault ? "Objects, spaces and everyday rituals. Inspired by Arewa heritage. Considered for the way we live today." : content.subheadline}
+        </p>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+          {content.cta_link.startsWith("/")
+            ? <LocalizedClientLink href={content.cta_link} className="brand-button !gap-4 !px-5 !tracking-[0.12em] small:!px-7">{isDefault ? "Explore the collection" : content.cta_label}<span aria-hidden="true">↗</span></LocalizedClientLink>
+            : <a href={content.cta_link} target="_blank" rel="noopener noreferrer" className="brand-button !gap-4 !px-5 !tracking-[0.12em] small:!px-7">{content.cta_label}<span aria-hidden="true">↗</span></a>}
+          <LocalizedClientLink href="/world" className="brand-link !gap-3 !tracking-[0.1em] text-areve-walnut">Our story <span aria-hidden="true">→</span></LocalizedClientLink>
         </div>
+        <p className="eyebrow mt-12 hidden text-areve-walnut small:block">Rooted in heritage. Made for today.</p>
       </div>
+      {content.image_url ? <div className="relative min-h-[460px] small:min-h-[590px]"><Image src={content.image_url} alt="" fill priority sizes="(max-width: 1023px) 100vw, 50vw" className="object-cover" unoptimized /></div> : <GiftStudy />}
     </section>
   )
 }

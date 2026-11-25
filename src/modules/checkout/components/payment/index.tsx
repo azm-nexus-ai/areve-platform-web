@@ -109,7 +109,7 @@ const Payment = ({
   }, [isOpen])
 
   return (
-    <div className="bg-white">
+    <div className="bg-semantic-surface-canvas">
       <div className="flex flex-row items-center justify-between mb-6">
         <Heading
           level="h2"
@@ -128,7 +128,7 @@ const Payment = ({
           <Text>
             <button
               onClick={handleEdit}
-              className="text-blue-800 hover:text-blue-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+              className="text-areve-walnut hover:text-areve-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
               data-testid="edit-payment-button"
             >
               Edit
@@ -141,6 +141,7 @@ const Payment = ({
           {!paidByGiftcard && availablePaymentMethods?.length > 0 && (
             <>
               <RadioGroup
+                aria-label="Payment method"
                 value={selectedPaymentMethod}
                 onChange={(value: string) => setPaymentMethod(value)}
               >

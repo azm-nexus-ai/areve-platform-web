@@ -25,7 +25,7 @@ export default async function Checkout({
 
   const customer = await retrieveCustomer()
   return (
-    <main className="content-container py-10 small:py-16">
+    <main id="main-content" className="content-container py-10 small:py-16">
       <h1 className="mb-6 font-serif text-4xl text-semantic-text-primary">Checkout</h1>
       <CheckoutProgress />
       <div className="grid grid-cols-1 gap-10 small:grid-cols-[minmax(0,1fr)_360px] small:gap-12">
