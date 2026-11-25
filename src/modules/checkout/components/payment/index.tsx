@@ -19,7 +19,7 @@ const Payment = ({
   availablePaymentMethods: any[]
 }) => {
   const activeSession = cart.payment_collection?.payment_sessions?.find(
-    (paymentSession: any) => paymentSession.status === "pending"
+    (paymentSession: any) => ["pending", "authorized", "captured"].includes(paymentSession.status)
   )
 
   const [isLoading, setIsLoading] = useState(false)

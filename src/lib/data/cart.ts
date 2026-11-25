@@ -5,6 +5,7 @@ import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
 import { revalidatePath, revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
+import { isRedirectError } from "next/dist/client/components/redirect-error"
 import {
   getAuthHeaders,
   getCacheOptions,
@@ -431,6 +432,13 @@ export async function placeOrder(cartId?: string) {
   }
 
   return cartRes.cart
+}
+
+/** Re-check the cookie-bound checkout without initiating a new charge. */
+export async function checkPaymentOrder() {
+  try { await placeOrder() }
+  catch (error) { if (isRedirectError(error)) throw error }
+  return { message: "Your order is not confirmed yet. If money has left your account, do not pay again. Keep your payment reference and contact AREVÉ for reconciliation." }
 }
 
 /**
