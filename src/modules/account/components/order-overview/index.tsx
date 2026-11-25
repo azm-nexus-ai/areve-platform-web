@@ -1,6 +1,5 @@
 "use client"
 
-import { Button } from "@medusajs/ui"
 
 import OrderCard from "../order-card"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -13,7 +12,7 @@ const OrderOverview = ({ orders }: { orders: HttpTypes.StoreOrder[] }) => {
         {orders.map((o) => (
           <div
             key={o.id}
-            className="border-b border-gray-200 pb-6 last:pb-0 last:border-none"
+            className="border-b border-semantic-border-subtle pb-6 last:pb-0 last:border-none"
           >
             <OrderCard order={o} />
           </div>
@@ -24,18 +23,16 @@ const OrderOverview = ({ orders }: { orders: HttpTypes.StoreOrder[] }) => {
 
   return (
     <div
-      className="w-full flex flex-col items-center gap-y-4"
+      className="flex w-full flex-col items-start gap-y-4 bg-semantic-surface-muted p-6 small:p-8"
       data-testid="no-orders-container"
     >
-      <h2 className="text-large-semi">Nothing to see here</h2>
+      <h2 className="font-serif text-2xl">Your next chapter starts here</h2>
       <p className="text-base-regular">
-        You don&apos;t have any orders yet, let us change that {":)"}
+        Orders placed while signed in will appear here, ready to revisit whenever you need them.
       </p>
       <div className="mt-4">
-        <LocalizedClientLink href="/" passHref>
-          <Button data-testid="continue-shopping-button">
-            Continue shopping
-          </Button>
+        <LocalizedClientLink href="/store" data-testid="continue-shopping-button" className="inline-flex min-h-11 items-center text-sm font-medium underline underline-offset-4">
+          Explore the collection
         </LocalizedClientLink>
       </div>
     </div>

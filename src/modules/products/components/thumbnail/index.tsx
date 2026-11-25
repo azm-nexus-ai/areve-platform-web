@@ -1,6 +1,8 @@
+"use client"
+
 import { Container, clx } from "@medusajs/ui"
 import Image from "next/image"
-import React from "react"
+import React, { useState } from "react"
 import PlaceholderImage from "@modules/common/icons/placeholder-image"
 
 type ThumbnailProps = {
@@ -19,6 +21,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
   alt = "Product image", sizes, "data-testid": dataTestid,
 }) => {
   const initialImage = thumbnail || images?.[0]?.url
+  const [failed, setFailed] = useState<string | null>(null)
   return (
     <Container
       className={clx(
@@ -36,9 +39,10 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
       )}
       data-testid={dataTestid}
     >
-      {initialImage ? (
+      {initialImage && failed !== initialImage ? (
         <Image
           src={initialImage}
+          onError={() => setFailed(initialImage)}
           alt={alt}
           className="absolute inset-0 object-cover object-center"
           draggable={false}
@@ -47,7 +51,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
           fill
         />
       ) : (
-        <div className="absolute inset-0 flex h-full w-full items-center justify-center" role="img" aria-label={alt}>
+        <div className="absolute inset-0 flex h-full w-full items-center justify-center" role={alt ? "img" : undefined} aria-label={alt ? `${alt}: image unavailable` : undefined} aria-hidden={!alt}>
           <PlaceholderImage size={size === "small" ? 16 : 24} />
         </div>
       )}

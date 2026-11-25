@@ -4,9 +4,10 @@ import { visiblePages } from "@lib/util/catalogue-query"
 import { clx } from "@medusajs/ui"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
-export function Pagination({ page, totalPages, "data-testid": dataTestid }: {
+export function Pagination({ page, totalPages, label = "Product pages", "data-testid": dataTestid }: {
   page: number
   totalPages: number
+  label?: string
   "data-testid"?: string
 }) {
   const router = useRouter()
@@ -20,7 +21,7 @@ export function Pagination({ page, totalPages, "data-testid": dataTestid }: {
   const visible = visiblePages(page, totalPages)
 
   return (
-    <nav aria-label="Product pages" className="mt-12 flex justify-center" data-testid={dataTestid}>
+    <nav aria-label={label} className="mt-12 flex justify-center" data-testid={dataTestid}>
       <ul className="flex flex-wrap items-center gap-2">
         {visible.map((p, index) => (
           <li key={p} className="flex items-center gap-2">

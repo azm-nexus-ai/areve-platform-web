@@ -26,7 +26,7 @@ export default async function Profile() {
   return (
     <div className="w-full" data-testid="profile-page-wrapper">
       <div className="mb-8 flex flex-col gap-y-4">
-        <h1 className="text-2xl-semi">Profile</h1>
+        <h1 className="font-serif text-4xl small:text-5xl">Profile</h1>
         <p className="text-base-regular">
           Update your name, phone number and billing address, or request a
           password reset. Contact support to change your email address.
@@ -48,5 +48,5 @@ export default async function Profile() {
 }
 
 const Divider = () => {
-  return <div className="w-full h-px bg-gray-200" />
+  return <div className="w-full h-px bg-semantic-border-subtle" />
 }

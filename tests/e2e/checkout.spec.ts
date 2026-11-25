@@ -13,7 +13,8 @@ async function addFixtureProduct(page: Page) {
 test("product → cart → gift message → address → flat-fee delivery", async ({ page }) => {
   await page.goto("/ng/products/sample-gift-box")
   const accessible = async (label: string) => {
-    const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()
+    await page.evaluate(() => document.fonts.ready)
+    const result = await new AxeBuilder({ page }).analyze()
     expect.soft(result.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => ({ target: n.target, html: n.html, summary: n.failureSummary })) })), label).toEqual([])
   }
   await accessible("product")
@@ -60,8 +61,10 @@ test("cross-site payment return retains the real cart cookie", async ({ page, co
   // 127.0.0.1 and localhost are different sites. This simulates a hosted payment
   // return without visiting Paystack or making any real payment request.
   const origin = new URL(page.url()).origin
-  await page.route("http://127.0.0.1:8010/**", (route) => route.fulfill({ contentType: "text/html; charset=utf-8", body: `<a href="${origin}/ng/checkout/paystack/callback?reference=fixture_unpaid">Return to AREVÉ</a>` }))
-  await page.goto("http://127.0.0.1:8010/payment-fixture")
+  const otherHost = new URL(origin).hostname === "127.0.0.1" ? "localhost" : "127.0.0.1"
+  const otherOrigin = `http://${otherHost}:8010`
+  await page.route(`${otherOrigin}/**`, (route) => route.fulfill({ contentType: "text/html; charset=utf-8", body: `<a href="${origin}/ng/checkout/paystack/callback?reference=fixture_unpaid">Return to AREVÉ</a>` }))
+  await page.goto(`${otherOrigin}/payment-fixture`)
   const callback = page.waitForRequest((request) => request.url().includes("/checkout/paystack/callback"))
   await page.getByRole("link", { name: "Return to AREVÉ" }).click()
   const headers = await (await callback).allHeaders()
@@ -91,7 +94,7 @@ test("invalid and skipped checkout steps return to the next required step", asyn
 test("cart quantities update and failed removals remain retryable", async ({ page }) => {
   await addFixtureProduct(page)
   await page.goto("/ng/cart")
-  const quantity = page.getByRole("combobox", { name: "Quantity for Sample Housewarming Gift Box" })
+  const quantity = page.getByRole("combobox", { name: /^Quantity for / })
   // The cart payload omits exact stock. The server must still reject a quantity
   // above the fixture's stock and leave the persisted cart unchanged.
   await quantity.selectOption("99")

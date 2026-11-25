@@ -27,7 +27,7 @@ export default async function ProductTemplate({ product, region, countryCode, im
     <main id="main-content" className="pb-28 small:pb-0" data-testid="product-container">
       <div className="content-container grid gap-8 py-8 small:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] small:gap-12 small:py-14">
         <div className="min-w-0">
-          <ImageGallery images={images} />
+          <ImageGallery images={images} title={product.title} />
         </div>
         <div className="flex min-w-0 flex-col gap-7">
           <ProductInfo product={product} />

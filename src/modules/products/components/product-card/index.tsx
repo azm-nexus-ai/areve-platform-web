@@ -17,7 +17,6 @@ export default function ProductCard({ product, isFeatured }: ProductCardProps) {
     <LocalizedClientLink
       href={`/products/${product.handle}`}
       className="group block text-semantic-text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-semantic-focus"
-      aria-label={`View ${product.title}`}
     >
       <article data-testid="product-wrapper">
         <Thumbnail
@@ -25,7 +24,7 @@ export default function ProductCard({ product, isFeatured }: ProductCardProps) {
           images={product.images}
           size="full"
           isFeatured={isFeatured}
-          alt={product.title}
+          alt=""
           sizes="(max-width: 1023px) 50vw, 25vw"
           className="!aspect-[4/5] rounded-none bg-semantic-surface-muted shadow-none transition-opacity duration-200 group-hover:opacity-90"
         />

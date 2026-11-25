@@ -1,17 +1,16 @@
-import { Suspense } from "react"
 import { listCategories } from "@lib/data/categories"
 import { listRegions } from "@lib/data/regions"
 import { listLocales } from "@lib/data/locales"
 import { getLocale } from "@lib/data/locale-actions"
 import { getAreveConfig } from "@lib/data/areve"
-import { StoreRegion } from "@medusajs/types"
+import { StoreRegion, HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import CartButton from "@modules/layout/components/cart-button"
+import CartDropdown from "@modules/layout/components/cart-dropdown"
 import SearchOverlay from "@modules/layout/components/search-overlay"
 import SideMenu from "@modules/layout/components/side-menu"
 import StoreHeader from "@modules/layout/components/store-header"
 
-export default async function Nav() {
+export default async function Nav({ cart }: { cart: HttpTypes.StoreCart | null }) {
   const [regions, locales, currentLocale, categories, config] = await Promise.all([
     listRegions().then((regions: StoreRegion[]) => regions),
     listLocales(),
@@ -30,13 +29,7 @@ export default async function Nav() {
       >
         Account
       </LocalizedClientLink>
-      <Suspense fallback={
-        <LocalizedClientLink className="text-xs font-medium uppercase tracking-[0.08em] hover:text-semantic-text-accent" href="/cart" data-testid="nav-cart-link">
-          Cart (0)
-        </LocalizedClientLink>
-      }>
-        <CartButton />
-      </Suspense>
+      <CartDropdown cart={cart} />
     </>
   )
 

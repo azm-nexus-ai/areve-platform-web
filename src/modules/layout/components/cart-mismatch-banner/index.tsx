@@ -1,57 +1,21 @@
 "use client"
 
 import { transferCart } from "@lib/data/customer"
-import { ExclamationCircleSolid } from "@medusajs/icons"
-import { StoreCart, StoreCustomer } from "@medusajs/types"
-import { Button } from "@medusajs/ui"
-import { useState } from "react"
+import type { StoreCart, StoreCustomer } from "@medusajs/types"
+import { useState, useTransition } from "react"
 
-function CartMismatchBanner(props: {
-  customer: StoreCustomer
-  cart: StoreCart
-}) {
-  const { customer, cart } = props
-  const [isPending, setIsPending] = useState(false)
-  const [actionText, setActionText] = useState("Run transfer again")
+export default function CartMismatchBanner({ customer, cart }: { customer: StoreCustomer; cart: StoreCart }) {
+  const [pending, startTransition] = useTransition()
+  const [error, setError] = useState("")
+  if (!customer || cart.customer_id) return null
 
-  if (!customer || !!cart.customer_id) {
-    return
-  }
-
-  const handleSubmit = async () => {
-    try {
-      setIsPending(true)
-      setActionText("Transferring..")
-
-      await transferCart()
-    } catch {
-      setActionText("Run transfer again")
-      setIsPending(false)
-    }
-  }
-
-  return (
-    <div className="flex items-center justify-center small:p-4 p-2 text-center bg-orange-300 small:gap-2 gap-1 text-sm mt-2 text-orange-800">
-      <div className="flex flex-col small:flex-row small:gap-2 gap-1 items-center">
-        <span className="flex items-center gap-1">
-          <ExclamationCircleSolid className="inline" />
-          Something went wrong when we tried to transfer your cart
-        </span>
-
-        <span>·</span>
-
-        <Button
-          variant="transparent"
-          className="hover:bg-transparent active:bg-transparent focus:bg-transparent disabled:text-orange-500 text-orange-950 p-0 bg-transparent"
-          size="base"
-          disabled={isPending}
-          onClick={handleSubmit}
-        >
-          {actionText}
-        </Button>
-      </div>
-    </div>
-  )
+  return <section aria-label="Account basket recovery" className="border-b border-semantic-border-subtle bg-semantic-surface-muted px-6 py-4 text-center text-sm text-semantic-text-primary">
+    <p>We couldn’t connect this basket to your account. Your items are still here.</p>
+    <button type="button" disabled={pending} aria-busy={pending} className="mt-1 inline-flex min-h-11 items-center font-medium underline underline-offset-4 disabled:opacity-60" onClick={() => startTransition(async () => {
+      setError("")
+      try { await transferCart() }
+      catch { setError("Your basket could not be connected. Please try again when your connection is restored.") }
+    })}>{pending ? "Connecting your basket…" : "Try again"}</button>
+    {error && <p role="alert" className="text-semantic-text-error">{error}</p>}
+  </section>
 }
-
-export default CartMismatchBanner

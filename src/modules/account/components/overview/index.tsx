@@ -1,168 +1,22 @@
-import { Container } from "@medusajs/ui"
-
-import ChevronDown from "@modules/common/icons/chevron-down"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { convertToLocale } from "@lib/util/money"
-import { HttpTypes } from "@medusajs/types"
+import type { HttpTypes } from "@medusajs/types"
 
-type OverviewProps = {
-  customer: HttpTypes.StoreCustomer | null
-  orders: HttpTypes.StoreOrder[] | null
-}
-
-const Overview = ({ customer, orders }: OverviewProps) => {
-  return (
-    <div data-testid="overview-page-wrapper">
-      <div className="hidden small:block">
-        <div className="text-xl-semi flex justify-between items-center mb-4">
-          <span data-testid="welcome-message" data-value={customer?.first_name}>
-            Hello {customer?.first_name}
-          </span>
-          <span className="text-small-regular text-ui-fg-base">
-            Signed in as:{" "}
-            <span
-              className="font-semibold"
-              data-testid="customer-email"
-              data-value={customer?.email}
-            >
-              {customer?.email}
-            </span>
-          </span>
-        </div>
-        <div className="flex flex-col py-8 border-t border-gray-200">
-          <div className="flex flex-col gap-y-4 h-full col-span-1 row-span-2 flex-1">
-            <div className="flex items-start gap-x-16 mb-6">
-              <div className="flex flex-col gap-y-4">
-                <h3 className="text-large-semi">Profile</h3>
-                <div className="flex items-end gap-x-2">
-                  <span
-                    className="text-3xl-semi leading-none"
-                    data-testid="customer-profile-completion"
-                    data-value={getProfileCompletion(customer)}
-                  >
-                    {getProfileCompletion(customer)}%
-                  </span>
-                  <span className="uppercase text-base-regular text-ui-fg-subtle">
-                    Completed
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-y-4">
-                <h3 className="text-large-semi">Addresses</h3>
-                <div className="flex items-end gap-x-2">
-                  <span
-                    className="text-3xl-semi leading-none"
-                    data-testid="addresses-count"
-                    data-value={customer?.addresses?.length || 0}
-                  >
-                    {customer?.addresses?.length || 0}
-                  </span>
-                  <span className="uppercase text-base-regular text-ui-fg-subtle">
-                    Saved
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-y-4">
-              <div className="flex items-center gap-x-2">
-                <h3 className="text-large-semi">Recent orders</h3>
-              </div>
-              <ul
-                className="flex flex-col gap-y-4"
-                data-testid="orders-wrapper"
-              >
-                {orders && orders.length > 0 ? (
-                  orders.slice(0, 5).map((order) => {
-                    return (
-                      <li
-                        key={order.id}
-                        data-testid="order-wrapper"
-                        data-value={order.id}
-                      >
-                        <LocalizedClientLink
-                          href={`/account/orders/details/${order.id}`}
-                        >
-                          <Container className="bg-gray-50 flex justify-between items-center p-4">
-                            <div className="grid grid-cols-3 grid-rows-2 text-small-regular gap-x-4 flex-1">
-                              <span className="font-semibold">Date placed</span>
-                              <span className="font-semibold">
-                                Order number
-                              </span>
-                              <span className="font-semibold">
-                                Total amount
-                              </span>
-                              <span data-testid="order-created-date">
-                                {new Date(order.created_at).toDateString()}
-                              </span>
-                              <span
-                                data-testid="order-id"
-                                data-value={order.display_id}
-                              >
-                                #{order.display_id}
-                              </span>
-                              <span data-testid="order-amount">
-                                {convertToLocale({
-                                  amount: order.total,
-                                  currency_code: order.currency_code,
-                                })}
-                              </span>
-                            </div>
-                            <button
-                              className="flex items-center justify-between"
-                              data-testid="open-order-button"
-                            >
-                              <span className="sr-only">
-                                Go to order #{order.display_id}
-                              </span>
-                              <ChevronDown className="-rotate-90" />
-                            </button>
-                          </Container>
-                        </LocalizedClientLink>
-                      </li>
-                    )
-                  })
-                ) : (
-                  <span data-testid="no-orders-message">No recent orders</span>
-                )}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
+export default function Overview({ customer, orders }: { customer: HttpTypes.StoreCustomer | null; orders: HttpTypes.StoreOrder[] | null }) {
+  const complete = [customer?.email, customer?.first_name && customer?.last_name, customer?.phone, customer?.addresses?.some(address => address.is_default_billing)].filter(Boolean).length * 25
+  return <div data-testid="overview-page-wrapper">
+    <h1 className="font-serif text-4xl small:text-5xl" data-testid="welcome-message" data-value={customer?.first_name}>Welcome{customer?.first_name ? `, ${customer.first_name}` : " back"}</h1>
+    <p className="mt-4 break-words text-sm leading-6 text-semantic-text-muted">Signed in as <span data-testid="customer-email" data-value={customer?.email}>{customer?.email}</span></p>
+    <div className="my-8 grid grid-cols-2 gap-4 border-y border-semantic-border-subtle py-6">
+      <LocalizedClientLink href="/account/profile" className="space-y-2"><h2 className="text-sm font-medium">Your profile</h2><p className="font-serif text-3xl" data-testid="customer-profile-completion" data-value={complete}>{complete}%</p><p className="text-xs text-semantic-text-muted">Complete your details</p></LocalizedClientLink>
+      <LocalizedClientLink href="/account/addresses" className="space-y-2"><h2 className="text-sm font-medium">Saved addresses</h2><p className="font-serif text-3xl" data-testid="addresses-count" data-value={customer?.addresses?.length ?? 0}>{customer?.addresses?.length ?? 0}</p><p className="text-xs text-semantic-text-muted">Manage delivery details</p></LocalizedClientLink>
     </div>
-  )
+    <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="font-serif text-2xl">Recent orders</h2><LocalizedClientLink href="/account/orders" className="inline-flex min-h-11 items-center text-sm underline underline-offset-4">View all orders</LocalizedClientLink></div>
+    {orders?.length ? <ul className="mt-4 divide-y divide-semantic-border-subtle" data-testid="orders-wrapper">{orders.slice(0, 5).map(order => <li key={order.id} data-testid="order-wrapper" data-value={order.id}>
+      <LocalizedClientLink href={`/account/orders/details/${order.id}`} className="flex flex-wrap items-center justify-between gap-3 py-5 hover:text-semantic-text-accent" data-testid="open-order-button">
+        <div><p className="text-sm font-medium" data-testid="order-id" data-value={order.display_id}>Order #{order.display_id}</p><p className="mt-1 text-xs text-semantic-text-muted" data-testid="order-created-date">{new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeZone: "Africa/Lagos" }).format(new Date(order.created_at))}</p></div>
+        <p className="text-sm" data-testid="order-amount">{convertToLocale({ amount: order.total, currency_code: order.currency_code })}<span aria-hidden="true" className="ml-3">→</span></p>
+      </LocalizedClientLink>
+    </li>)}</ul> : <div className="mt-4 bg-semantic-surface-muted p-6"><p className="text-sm leading-6" data-testid="no-orders-message">Your signed-in orders will appear here. Explore the collection when you’re ready.</p><LocalizedClientLink href="/store" className="mt-3 inline-flex min-h-11 items-center text-sm font-medium underline underline-offset-4">Discover the collection</LocalizedClientLink></div>}
+  </div>
 }
-
-const getProfileCompletion = (customer: HttpTypes.StoreCustomer | null) => {
-  let count = 0
-
-  if (!customer) {
-    return 0
-  }
-
-  if (customer.email) {
-    count++
-  }
-
-  if (customer.first_name && customer.last_name) {
-    count++
-  }
-
-  if (customer.phone) {
-    count++
-  }
-
-  const billingAddress = customer.addresses?.find(
-    (addr) => addr.is_default_billing
-  )
-
-  if (billingAddress) {
-    count++
-  }
-
-  return (count / 4) * 100
-}
-
-export default Overview

@@ -16,6 +16,10 @@ const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  experimental: {
+    // Limit the Medusa barrel exports to components actually used by each route.
+    optimizePackageImports: ["@medusajs/ui", "@medusajs/icons"],
+  },
   async headers() {
     const noIndex = { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }
     return [

@@ -127,7 +127,7 @@ const ProfileBillingAddress: React.FC<MyInformationProps> = ({
             label="Phone"
             name="phone"
             type="phone"
-            autoComplete="phone"
+            autoComplete="tel"
             required
             defaultValue={billingAddress?.phone ?? customer?.phone ?? ""}
             data-testid="billing-phone-input"

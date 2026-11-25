@@ -86,3 +86,35 @@ test("narrow viewport retains all packaging controls and navigation without over
     expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(320)
   }
 })
+
+
+test("variant selection retains price, focus and an accessible mobile dialog", async ({ page }, info) => {
+  await page.goto("/ng/products/sample-reed-diffuser")
+  await expect(page.getByTestId("product-container")).toBeVisible()
+  const options = page.getByTestId("product-options").filter({ visible: true })
+  await expect(options).toBeVisible()
+  const choices = options.getByTestId("option-button")
+  await expect(choices).toHaveCount(2)
+  await choices.first().click()
+  await expect(choices.first()).toHaveAttribute("aria-pressed", "true")
+  await expect(page.getByTestId("add-product-button").first()).toBeEnabled()
+  await expect(page).toHaveURL(/v_id=variant_/)
+  if (info.project.name === "mobile") {
+    await page.evaluate(() => scrollTo(0, document.body.scrollHeight))
+    const trigger = page.getByTestId("mobile-actions-button")
+    await expect(trigger).toBeVisible()
+    await trigger.click()
+    const dialog = page.getByRole("dialog", { name: "Choose your options" })
+    await expect(dialog).toBeVisible()
+    await dialog.getByTestId("option-button").last().click()
+    await expect(dialog.getByTestId("option-button").last()).toHaveAttribute("aria-pressed", "true")
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([])
+    await dialog.getByRole("button", { name: "Done", exact: true }).click()
+    await expect(dialog).not.toBeVisible()
+    await expect(trigger).toBeFocused()
+  } else {
+    await choices.last().click()
+    await expect(choices.last()).toHaveAttribute("aria-pressed", "true")
+    await expect(choices.first()).toHaveAttribute("aria-pressed", "false")
+  }
+})

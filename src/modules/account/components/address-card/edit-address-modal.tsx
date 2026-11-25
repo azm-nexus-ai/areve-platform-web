@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState, useActionState } from "react"
+import React, { useEffect, useState, useActionState, useTransition } from "react"
 import { PencilSquare as Edit, Trash } from "@medusajs/icons"
 import { Button, Heading, Text, clx } from "@medusajs/ui"
 
@@ -29,6 +29,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
 }) => {
   const [removing, setRemoving] = useState(false)
   const [removeError, setRemoveError] = useState<string | null>(null)
+  const [pending, startTransition] = useTransition()
   const [successState, setSuccessState] = useState(false)
   const { state, open, close: closeModal } = useToggleState(false)
 
@@ -83,6 +84,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
       >
         <div className="flex flex-col">
           <Heading
+            level="h2"
             className="text-left text-base-semi"
             data-testid="address-name"
           >
@@ -112,7 +114,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
         </div>
         <div className="flex items-center gap-x-4">
           <button
-            className="text-small-regular text-ui-fg-base flex items-center gap-x-2"
+            className="text-small-regular text-ui-fg-base flex min-h-11 items-center gap-x-2"
             onClick={open}
             data-testid="address-edit-button"
           >
@@ -120,10 +122,10 @@ const EditAddress: React.FC<EditAddressProps> = ({
             Edit
           </button>
           <button
-            className="text-small-regular text-ui-fg-base flex items-center gap-x-2"
-            onClick={removeAddress}
-            disabled={removing}
-            aria-busy={removing}
+            className="text-small-regular text-ui-fg-base flex min-h-11 items-center gap-x-2"
+            onClick={() => startTransition(removeAddress)}
+            disabled={removing || pending}
+            aria-busy={removing || pending}
             data-testid="address-delete-button"
           >
             {removing ? <Spinner /> : <Trash />}
@@ -135,7 +137,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
 
       <Modal isOpen={state} close={close} data-testid="edit-address-modal">
         <Modal.Title>
-          <Heading className="mb-2">Edit address</Heading>
+          <Heading level="h2" className="mb-2 font-serif text-2xl">Edit address</Heading>
         </Modal.Title>
         <form action={formAction}>
           <input type="hidden" name="addressId" value={address.id} />
@@ -181,7 +183,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
                 defaultValue={address.address_2 || undefined}
                 data-testid="address-2-input"
               />
-              <div className="grid grid-cols-[144px_1fr] gap-x-2">
+              <div className="grid grid-cols-2 gap-x-2">
                 <Input
                   label="Postal code"
                   name="postal_code"
@@ -194,7 +196,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
                   label="City"
                   name="city"
                   required
-                  autoComplete="locality"
+                  autoComplete="address-level2"
                   defaultValue={address.city || undefined}
                   data-testid="city-input"
                 />
@@ -217,7 +219,7 @@ const EditAddress: React.FC<EditAddressProps> = ({
               <Input
                 label="Phone"
                 name="phone"
-                autoComplete="phone"
+                autoComplete="tel"
                 defaultValue={address.phone || undefined}
                 data-testid="phone-input"
               />

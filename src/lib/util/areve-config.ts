@@ -18,6 +18,7 @@ export type AreveConfig = {
   whatsapp_number: string | null
   support_email: string | null
   checkout_available: boolean
+  account_registration_available: boolean
   content: StorefrontContent
 }
 
@@ -40,6 +41,7 @@ export const AREVE_CONFIG_DEFAULTS: AreveConfig = {
   whatsapp_number: null,
   support_email: null,
   checkout_available: false,
+  account_registration_available: false,
   content: DEFAULT_STOREFRONT_CONTENT,
 }
 
@@ -100,6 +102,7 @@ export function resolveAreveConfig(fromApi: ApiConfig | null | undefined, env: E
       toWhatsAppNumber(fromApi?.whatsapp_number) ?? toWhatsAppNumber(env.NEXT_PUBLIC_WHATSAPP_NUMBER),
     support_email: typeof fromApi?.support_email === "string" && /^[a-zA-Z0-9._+-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/.test(fromApi.support_email) ? fromApi.support_email : null,
     checkout_available: fromApi?.checkout_available === true,
+    account_registration_available: fromApi?.account_registration_available === true,
     content: resolveStorefrontContent(fromApi?.content),
   }
 }

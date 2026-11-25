@@ -1,7 +1,7 @@
 import { deleteLineItem } from "@lib/data/cart"
 import { Spinner, Trash } from "@medusajs/icons"
 import { clx } from "@medusajs/ui"
-import { useState } from "react"
+import { useState, useTransition } from "react"
 
 const DeleteButton = ({
   id,
@@ -18,6 +18,7 @@ const DeleteButton = ({
 }) => {
   const [isDeleting, setIsDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [pending, startTransition] = useTransition()
 
   const handleDelete = async (id: string) => {
     if (isDeleting) return
@@ -42,11 +43,11 @@ const DeleteButton = ({
       <button
         type="button"
         aria-label={label}
-        aria-busy={isDeleting}
-        disabled={isDeleting}
+        aria-busy={isDeleting || pending}
+        disabled={isDeleting || pending}
         data-testid={dataTestId}
         className="flex gap-x-1 text-ui-fg-subtle hover:text-ui-fg-base cursor-pointer min-h-11 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-        onClick={() => handleDelete(id)}
+        onClick={() => startTransition(() => handleDelete(id))}
       >
         {isDeleting ? <Spinner className="animate-spin" /> : <Trash />}
         <span>{children}</span>
