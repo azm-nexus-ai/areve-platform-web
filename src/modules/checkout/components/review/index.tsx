@@ -3,6 +3,7 @@
 import { Heading, clx } from "@medusajs/ui"
 import PaymentButton from "../payment-button"
 import { useSearchParams } from "next/navigation"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 const Review = ({ cart }: { cart: any }) => {
   const searchParams = useSearchParams()
@@ -34,7 +35,7 @@ const Review = ({ cart }: { cart: any }) => {
           )}
           <p className="text-sm leading-6 text-semantic-text-muted">
             Check your contact, delivery method and order total before proceeding.
-            Delivery and returns information is being finalised; contact AREVÉ if you need clarification before paying.
+            Read our <LocalizedClientLink href="/delivery" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">delivery</LocalizedClientLink> and <LocalizedClientLink href="/returns" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">returns</LocalizedClientLink> policies before payment. These links open in a new tab.
           </p>
           {previousStepsCompleted ? (
             <PaymentButton cart={cart} data-testid="submit-order-button" />

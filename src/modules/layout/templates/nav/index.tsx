@@ -41,7 +41,7 @@ export default async function Nav() {
   )
 
   return (
-    <div className="small:sticky small:inset-x-0 small:top-0 small:z-50">
+    <header className="small:sticky small:inset-x-0 small:top-0 small:z-50">
       <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-areve-ivory focus:p-4">Skip to content</a>
       <div className="bg-semantic-surface-inverse px-4 py-2 text-center text-semantic-text-inverse">
         {announcement.enabled ? (
@@ -82,6 +82,6 @@ export default async function Nav() {
           </div>
         </nav>
       )}
-    </div>
+    </header>
   )
 }
