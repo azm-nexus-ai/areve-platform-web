@@ -1,4 +1,3 @@
-import { Button } from "@medusajs/ui"
 import { useMemo } from "react"
 
 import Thumbnail from "@modules/products/components/thumbnail"
@@ -24,11 +23,11 @@ const OrderCard = ({ order }: OrderCardProps) => {
   }, [order])
 
   return (
-    <div className="bg-white flex flex-col" data-testid="order-card">
+    <div className="flex min-w-0 flex-col" data-testid="order-card">
       <div className="uppercase text-large-semi mb-1">
         #<span data-testid="order-display-id">{order.display_id}</span>
       </div>
-      <div className="flex items-center divide-x divide-gray-200 text-small-regular text-ui-fg-base">
+      <div className="flex flex-wrap items-center gap-y-2 divide-x divide-semantic-border-subtle text-small-regular text-semantic-text-muted">
         <span className="pr-2" data-testid="order-created-at">
           {new Date(order.created_at).toDateString()}
         </span>
@@ -64,20 +63,18 @@ const OrderCard = ({ order }: OrderCardProps) => {
             </div>
           )
         })}
-        {numberOfProducts > 4 && (
+        {numberOfProducts > 3 && (
           <div className="w-full h-full flex flex-col items-center justify-center">
             <span className="text-small-regular text-ui-fg-base">
-              + {numberOfLines - 4}
+              + {numberOfProducts - 3}
             </span>
             <span className="text-small-regular text-ui-fg-base">more</span>
           </div>
         )}
       </div>
       <div className="flex justify-end">
-        <LocalizedClientLink href={`/account/orders/details/${order.id}`}>
-          <Button data-testid="order-details-link" variant="secondary">
-            See details
-          </Button>
+        <LocalizedClientLink href={`/account/orders/details/${order.id}`} data-testid="order-details-link" className="inline-flex min-h-11 items-center text-sm font-medium underline underline-offset-4">
+          View order #{order.display_id}
         </LocalizedClientLink>
       </div>
     </div>

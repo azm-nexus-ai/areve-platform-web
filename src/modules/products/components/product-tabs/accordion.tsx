@@ -52,7 +52,7 @@ const Item: React.FC<AccordionItemProps> = ({
         className
       )}
     >
-      <AccordionPrimitive.Header className="px-1">
+      <AccordionPrimitive.Header asChild className="px-1"><h2>
         <AccordionPrimitive.Trigger className="flex min-h-11 w-full items-center justify-between gap-4 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4">
           <span className="flex flex-col gap-1">
             <span className="text-ui-fg-subtle text-sm">{title}</span>
@@ -60,7 +60,7 @@ const Item: React.FC<AccordionItemProps> = ({
           </span>
           <span aria-hidden="true">{customTrigger || <MorphingTrigger />}</span>
         </AccordionPrimitive.Trigger>
-      </AccordionPrimitive.Header>
+      </h2></AccordionPrimitive.Header>
       <AccordionPrimitive.Content
         forceMount={forceMountContent}
         className={clx(

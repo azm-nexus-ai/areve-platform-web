@@ -17,18 +17,18 @@ const Register = ({ setCurrentView }: Props) => {
 
   return (
     <div
-      className="max-w-sm flex flex-col items-center"
+      className="w-full flex flex-col items-start"
       data-testid="register-page"
     >
-      <h1 className="text-large-semi uppercase mb-6">
+      <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-semantic-text-accent">A considered connection</p>
+      <h1 className="mb-5 font-serif text-4xl small:text-5xl">
         Create your AREVÉ account
       </h1>
-      <p className="text-center text-base-regular text-ui-fg-base mb-4">
-        Create your AREVÉ Member profile, and get access to an enhanced
-        shopping experience.
+      <p className="mb-8 text-base leading-7 text-semantic-text-muted">
+        Keep your details close and follow the orders you place while signed in.
       </p>
       <form className="w-full flex flex-col" action={formAction}>
-        <div className="flex flex-col w-full gap-y-2">
+        <div className="flex flex-col w-full gap-y-4">
           <Input
             label="First name"
             name="first_name"
@@ -72,7 +72,7 @@ const Register = ({ setCurrentView }: Props) => {
         <p className="mt-2 text-sm">Use a unique password of 12–128 characters.</p>
         <ErrorMessage error={message} data-testid="register-error" />
         <span className="text-center text-ui-fg-base text-small-regular mt-6">
-          By creating an account, you agree to AREVÉ&apos;s{" "}
+          Read our{" "}
           <LocalizedClientLink
             href="/privacy"
             className="underline"
@@ -86,7 +86,7 @@ const Register = ({ setCurrentView }: Props) => {
           >
             Terms of Use
           </LocalizedClientLink>
-          .
+          {" "}before creating your account.
         </span>
         <SubmitButton className="w-full mt-6" data-testid="register-button">
           Join
@@ -96,7 +96,7 @@ const Register = ({ setCurrentView }: Props) => {
         Already a member?{" "}
         <button
           onClick={() => setCurrentView(LOGIN_VIEW.SIGN_IN)}
-          className="underline"
+          className="inline-flex min-h-11 items-center underline underline-offset-4"
         >
           Sign in
         </button>

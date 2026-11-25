@@ -2,6 +2,10 @@ import { placeOrder, retrieveCart } from "@lib/data/cart"
 import { NextRequest, NextResponse } from "next/server"
 import { isRedirectError } from "next/dist/client/components/redirect-error"
 
+// A relative Location retains the browser's origin. Next's reconstructed
+// request URL can normalize loopback hosts or use an internal proxy hostname.
+const redirectLocally = (path: string) => new NextResponse(null, { status: 303, headers: { Location: path, "Cache-Control": "no-store" } })
+
 /** Paystack returns here. The backend verifies the payment before completing the cart. */
 export async function GET(
   request: NextRequest,
@@ -11,10 +15,8 @@ export async function GET(
   const countryCode = /^[a-z]{2}$/.test(requestedCountry) ? requestedCountry : "ng"
   const status = request.nextUrl.searchParams.get("status")
   const retry = (payment: string) => {
-    const url = new URL(`/${countryCode}/checkout`, request.url)
-    url.searchParams.set("step", "review")
-    url.searchParams.set("payment", payment)
-    return NextResponse.redirect(url)
+    const query = new URLSearchParams({ step: "review", payment })
+    return redirectLocally(`/${countryCode}/checkout?${query}`)
   }
   if (status === "cancelled" || status === "abandoned" || status === "failed") return retry(status)
 
@@ -22,7 +24,7 @@ export async function GET(
     const cart = await retrieveCart()
     if (!cart) {
       // Repeated callback after successful cookie cleanup, expired session, or another browser.
-      return NextResponse.redirect(new URL(`/${countryCode}/cart?payment=session_missing`, request.url))
+      return redirectLocally(`/${countryCode}/cart?payment=session_missing`)
     }
     const reference = request.nextUrl.searchParams.get("reference") || request.nextUrl.searchParams.get("trxref")
     const matchingSession = cart.payment_collection?.payment_sessions?.some((session) =>

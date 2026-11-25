@@ -62,12 +62,12 @@ const MobileActions: React.FC<MobileActionsProps> = ({
         <Transition
           as={Fragment}
           show={show}
-          enter="ease-in-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-300"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
+          enter="motion-safe:transition-transform motion-safe:duration-200"
+          enterFrom="motion-safe:translate-y-full"
+          enterTo="translate-y-0"
+          leave="motion-safe:transition-transform motion-safe:duration-200"
+          leaveFrom="translate-y-0"
+          leaveTo="motion-safe:translate-y-full"
         >
           <div
             className="bg-semantic-surface-canvas flex flex-col gap-y-3 justify-center items-center text-large-regular p-4 pb-[max(1rem,env(safe-area-inset-bottom))] h-full w-full border-t border-semantic-border-subtle"
@@ -104,7 +104,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
               {!isSimple && <Button
                 onClick={open}
                 variant="secondary"
-                className="w-full"
+                className="w-full min-h-11 !transition-none"
                 data-testid="mobile-actions-button"
               >
                 <div className="flex items-center justify-between w-full">
@@ -119,7 +119,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
               <Button
                 onClick={handleAddToCart}
                 disabled={!inStock || !variant || isAdding || optionsDisabled}
-                className="w-full"
+                className="w-full min-h-11 !transition-none"
                 isLoading={isAdding}
                 data-testid="mobile-cart-button"
               >
@@ -134,7 +134,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
         </Transition>
       </div>
       <Transition appear show={state} as={Fragment}>
-        <Dialog as="div" className="relative z-[75]" onClose={close}>
+        <Dialog as="div" className="fixed inset-0 z-[75]" onClose={close}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -151,19 +151,21 @@ const MobileActions: React.FC<MobileActionsProps> = ({
             <div className="flex min-h-full h-full items-center justify-center text-center">
               <Transition.Child
                 as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0"
-                enterTo="opacity-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
+                enter="motion-safe:transition-transform motion-safe:duration-200"
+                enterFrom="motion-safe:translate-y-full"
+                enterTo="translate-y-0"
+                leave="motion-safe:transition-transform motion-safe:duration-200"
+                leaveFrom="translate-y-0"
+                leaveTo="motion-safe:translate-y-full"
               >
                 <Dialog.Panel
-                  className="w-full h-full transform overflow-hidden text-left flex flex-col gap-y-3"
+                  className="w-full max-h-[90dvh] transform overflow-y-auto text-left flex flex-col gap-y-3"
                   data-testid="mobile-actions-modal"
                 >
                   <div className="w-full flex justify-end pr-6">
                     <button
+                      type="button"
+                      aria-label="Close product options"
                       onClick={close}
                       className="bg-white w-12 h-12 rounded-full text-ui-fg-base flex justify-center items-center"
                       data-testid="close-modal-button"
@@ -171,7 +173,8 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                       <X />
                     </button>
                   </div>
-                  <div className="bg-white px-6 py-12">
+                  <div className="bg-semantic-surface-canvas px-6 py-8">
+                    <Dialog.Title className="mb-6 font-serif text-2xl">Choose your options</Dialog.Title>
                     {(product.variants?.length ?? 0) > 1 && (
                       <div className="flex flex-col gap-y-6">
                         {(product.options || []).map((option) => {
@@ -189,6 +192,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                         })}
                       </div>
                     )}
+                    <Button type="button" onClick={close} disabled={!variant} className="mt-6 min-h-11 w-full !transition-none">Done</Button>
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

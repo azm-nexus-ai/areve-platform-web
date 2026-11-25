@@ -10,13 +10,13 @@ export enum LOGIN_VIEW {
   REGISTER = "register",
 }
 
-const LoginTemplate = ({ resetComplete = false }: { resetComplete?: boolean }) => {
+const LoginTemplate = ({ resetComplete = false, registrationAvailable = false }: { resetComplete?: boolean; registrationAvailable?: boolean }) => {
   const [currentView, setCurrentView] = useState("sign-in")
 
   return (
-    <div className="w-full flex justify-start px-8 py-8">
-      {currentView === "sign-in" ? (
-        <Login setCurrentView={setCurrentView} resetComplete={resetComplete} />
+    <div className="w-full py-2 small:py-6">
+      {currentView === "sign-in" || !registrationAvailable ? (
+        <Login setCurrentView={setCurrentView} resetComplete={resetComplete} registrationAvailable={registrationAvailable} />
       ) : (
         <Register setCurrentView={setCurrentView} />
       )}

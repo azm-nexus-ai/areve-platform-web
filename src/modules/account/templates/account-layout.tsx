@@ -1,42 +1,16 @@
-import React from "react"
-
+import type { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-
 import AccountNav from "../components/account-nav"
-import { HttpTypes } from "@medusajs/types"
 
-interface AccountLayoutProps {
-  customer: HttpTypes.StoreCustomer | null
-  children: React.ReactNode
+export default function AccountLayout({ customer, children }: { customer: HttpTypes.StoreCustomer | null; children: React.ReactNode }) {
+  return <main id="main-content" className="content-container py-10 text-semantic-text-primary small:py-16" data-testid="account-page">
+    <div className={customer ? "grid min-w-0 gap-8 small:grid-cols-[180px_minmax(0,1fr)] small:gap-14" : "mx-auto max-w-lg"}>
+      {customer && <AccountNav customer={customer} />}
+      <div className="min-w-0">{children}</div>
+    </div>
+    <section aria-labelledby="account-help" className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-semantic-border-subtle pt-8 small:flex-row small:items-center">
+      <div><h2 id="account-help" className="font-serif text-2xl">A little assistance</h2><p className="mt-2 max-w-lg text-sm leading-6 text-semantic-text-muted">Find information about your delivery, returns and getting in touch with our team.</p></div>
+      <LocalizedClientLink className="inline-flex min-h-11 items-center text-sm font-medium text-semantic-text-accent underline underline-offset-4" href="/returns">Customer care</LocalizedClientLink>
+    </section>
+  </main>
 }
-
-const AccountLayout: React.FC<AccountLayoutProps> = ({
-  customer,
-  children,
-}) => {
-  return (
-    <main id="main-content" className="flex-1 small:py-12" data-testid="account-page">
-      <div className="flex-1 content-container h-full max-w-5xl mx-auto bg-white flex flex-col">
-        <div className="grid grid-cols-1  small:grid-cols-[240px_1fr] py-12">
-          <div>{customer && <AccountNav customer={customer} />}</div>
-          <div className="flex-1">{children}</div>
-        </div>
-        <div className="flex flex-col small:flex-row items-end justify-between small:border-t border-gray-200 py-12 gap-8">
-          <div>
-            <h3 className="text-xl-semi mb-4">Got questions?</h3>
-            <span className="txt-medium">
-              For help with an order, delivery or return, contact our support team.
-            </span>
-          </div>
-          <div>
-            <LocalizedClientLink className="underline text-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4" href="/returns">
-              Order support
-            </LocalizedClientLink>
-          </div>
-        </div>
-      </div>
-    </main>
-  )
-}
-
-export default AccountLayout

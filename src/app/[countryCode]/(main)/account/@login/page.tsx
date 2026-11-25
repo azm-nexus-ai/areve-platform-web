@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 
 import LoginTemplate from "@modules/account/templates/login-template"
+import { getAreveConfig } from "@lib/data/areve"
 
 export const metadata: Metadata = {
   title: "Sign in",
@@ -8,5 +9,6 @@ export const metadata: Metadata = {
 }
 
 export default async function Login({ searchParams }: { searchParams: Promise<{ password?: string }> }) {
-  return <LoginTemplate resetComplete={(await searchParams).password === "updated"} />
+  const config = await getAreveConfig()
+  return <LoginTemplate resetComplete={(await searchParams).password === "updated"} registrationAvailable={config.account_registration_available} />
 }

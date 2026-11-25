@@ -10,6 +10,7 @@ test("uses the API settings and normalises the WhatsApp number", () => {
     whatsapp_number: "0801 234 5678",
     support_email: "care@example.com",
     checkout_available: true,
+    account_registration_available: true,
   })
   assert.deepEqual(config, {
     currency_code: "ngn",
@@ -18,6 +19,7 @@ test("uses the API settings and normalises the WhatsApp number", () => {
     whatsapp_number: "2348012345678",
     support_email: "care@example.com",
     checkout_available: true,
+    account_registration_available: true,
     content: AREVE_CONFIG_DEFAULTS.content,
   })
 })

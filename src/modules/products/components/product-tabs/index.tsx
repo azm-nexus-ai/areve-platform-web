@@ -26,7 +26,7 @@ export default function ProductTabs({ product }: Props) {
   return (
     <div className="w-full text-semantic-text-primary">
       <Accordion type="multiple">
-        <Accordion.Item title="Details & care" headingSize="medium" value="details">
+        {(product.material || fields.length > 0 || metadata.gift_ready === true) && <Accordion.Item title="Details & care" headingSize="medium" value="details">
           <div className="space-y-4 py-5 text-sm leading-6">
             {product.material && <p><strong>Material:</strong> {product.material}</p>}
             {metadata.gift_ready === true && <p>Gift-ready</p>}
@@ -36,11 +36,8 @@ export default function ProductTabs({ product }: Props) {
                 <p className="whitespace-pre-line text-semantic-text-muted">{value}</p>
               </div>
             ))}
-            {!product.material && fields.length === 0 && metadata.gift_ready !== true && (
-              <p className="text-semantic-text-muted">Additional product details are coming soon.</p>
-            )}
           </div>
-        </Accordion.Item>
+        </Accordion.Item>}
         <Accordion.Item title="Delivery & returns" headingSize="medium" value="delivery">
           <div className="space-y-3 py-5 text-sm leading-6 text-semantic-text-muted">
             <p>Delivery options and fees are confirmed at checkout. Please check the current information before placing an order.</p>

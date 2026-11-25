@@ -9,23 +9,25 @@ import { useActionState } from "react"
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
   resetComplete?: boolean
+  registrationAvailable: boolean
 }
 
-const Login = ({ setCurrentView, resetComplete }: Props) => {
+const Login = ({ setCurrentView, resetComplete, registrationAvailable }: Props) => {
   const [message, formAction] = useActionState(login, null)
 
   return (
     <div
-      className="max-w-sm w-full flex flex-col items-center"
+      className="w-full flex flex-col items-start"
       data-testid="login-page"
     >
-      <h1 className="text-large-semi uppercase mb-6">Welcome back</h1>
+      <p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-semantic-text-accent">Your AREVÉ account</p>
+      <h1 className="mb-5 font-serif text-4xl small:text-5xl">Welcome back</h1>
       {resetComplete && <p role="status" className="mb-6 border-l-2 border-areve-botanical bg-areve-sand/30 p-4 text-sm leading-6">Your password has been updated. Sign in with your new password.</p>}
-      <p className="text-center text-base-regular text-ui-fg-base mb-8">
-        Sign in to access an enhanced shopping experience.
+      <p className="mb-8 text-base leading-7 text-semantic-text-muted">
+        Your orders, saved addresses and personal details, all in one place.
       </p>
       <form className="w-full" action={formAction}>
-        <div className="flex flex-col w-full gap-y-2">
+        <div className="flex flex-col w-full gap-y-4">
           <Input
             label="Email"
             name="email"
@@ -50,17 +52,17 @@ const Login = ({ setCurrentView, resetComplete }: Props) => {
         </SubmitButton>
       </form>
       <LocalizedClientLink href="/forgot-password" className="mt-4 inline-flex min-h-11 items-center underline">Forgot your password?</LocalizedClientLink>
-      <span className="text-center text-ui-fg-base text-small-regular mt-6">
+      {registrationAvailable ? <span className="text-center text-ui-fg-base text-small-regular mt-6">
         Not a member?{" "}
         <button
           onClick={() => setCurrentView(LOGIN_VIEW.REGISTER)}
-          className="underline"
+          className="inline-flex min-h-11 items-center underline underline-offset-4"
           data-testid="register-button"
         >
           Join us
         </button>
         .
-      </span>
+      </span> : <p className="mt-6 text-sm leading-6 text-semantic-text-muted">New account registration is temporarily paused. Existing customers can still sign in.</p>}
     </div>
   )
 }

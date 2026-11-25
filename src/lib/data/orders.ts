@@ -26,7 +26,7 @@ export const retrieveOrder = async (id: string) => {
     .catch((err) => medusaError(err))
 }
 
-export const listOrders = async (
+export const listOrderPage = async (
   limit: number = 10,
   offset: number = 0,
   filters?: Record<string, any>
@@ -48,6 +48,7 @@ export const listOrders = async (
       headers,
       cache: "no-store",
     })
-    .then(({ orders }) => orders)
     .catch((err) => medusaError(err))
 }
+
+export const listOrders = async (limit = 10, offset = 0, filters?: Record<string, unknown>) => (await listOrderPage(limit, offset, filters)).orders

@@ -6,7 +6,7 @@ test("catalogue search is accessible, keeps the first request and fits the viewp
   expect(response?.request().redirectedFrom()).toBeNull()
   await expect(page.getByTestId("products-list")).toBeVisible()
   expect((await page.context().cookies()).some(cookie => cookie.name === "_medusa_cache_id")).toBe(true)
-  await page.getByLabel("Search the catalogue").fill("Sample Gift Box")
+  await page.getByLabel("Search the catalogue").fill(process.env.AREVE_E2E_REVIEW === "local" ? "Welcome Gift" : "Sample Gift Box")
   await page.locator("main").getByRole("button", { name: "Search", exact: true }).click()
   await expect(page.getByRole("status").filter({ hasText: "Showing 1–1 of 1 products" })).toBeVisible()
   await expect(page.locator("main")).toHaveCount(1)

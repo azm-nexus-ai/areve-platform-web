@@ -6,7 +6,6 @@ import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
 import Divider from "@modules/common/components/divider"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
-import { isEqual } from "lodash"
 import { useParams, usePathname, useSearchParams } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
@@ -27,6 +26,7 @@ const optionsAsKeymap = (
     return acc
   }, {})
 }
+const sameOptions = (variant: Record<string, string> | undefined, selected: Record<string, string | undefined>) => !!variant && Object.keys(variant).length === Object.keys(selected).length && Object.entries(variant).every(([key, value]) => selected[key] === value)
 
 export default function ProductActions({
   product,
@@ -56,7 +56,7 @@ export default function ProductActions({
 
     return product.variants.find((v) => {
       const variantOptions = optionsAsKeymap(v.options)
-      return isEqual(variantOptions, options)
+      return sameOptions(variantOptions, options)
     })
   }, [product.variants, options])
 
@@ -72,7 +72,7 @@ export default function ProductActions({
   const isValidVariant = useMemo(() => {
     return product.variants?.some((v) => {
       const variantOptions = optionsAsKeymap(v.options)
-      return isEqual(variantOptions, options)
+      return sameOptions(variantOptions, options)
     })
   }, [product.variants, options])
 
@@ -173,7 +173,7 @@ export default function ProductActions({
             !isValidVariant
           }
           variant="primary"
-          className="w-full min-h-11"
+          className="w-full min-h-11 !transition-none"
           isLoading={isAdding}
           data-testid="add-product-button"
         >
