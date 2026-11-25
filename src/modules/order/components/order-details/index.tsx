@@ -16,9 +16,9 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
   return (
     <div>
       <Text>
-        We have sent the order confirmation details to{" "}
+        Your confirmation email is on its way to{" "}
         <span
-          className="text-ui-fg-medium-plus font-semibold"
+          className="text-areve-ink font-medium break-all"
           data-testid="order-email"
         >
           {order.email}
@@ -28,14 +28,14 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
       <Text className="mt-2">
         Order date:{" "}
         <span data-testid="order-date">
-          {new Date(order.created_at).toDateString()}
+          {new Intl.DateTimeFormat("en-GB", { dateStyle: "long", timeZone: "Africa/Lagos" }).format(new Date(order.created_at))}
         </span>
       </Text>
-      <Text className="mt-2 text-ui-fg-interactive">
+      <Text className="mt-2 text-areve-walnut">
         Order number: <span data-testid="order-id">{order.display_id}</span>
       </Text>
 
-      <div className="flex items-center text-compact-small gap-x-4 mt-4">
+      <div className="flex flex-wrap items-center text-compact-small gap-4 mt-4">
         {showStatus && (
           <>
             <Text>
@@ -48,7 +48,7 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
               Payment status:{" "}
               <span
                 className="text-ui-fg-subtle "
-                sata-testid="order-payment-status"
+                data-testid="order-payment-status"
               >
                 {formatStatus(order.payment_status)}
               </span>

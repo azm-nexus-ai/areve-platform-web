@@ -1,63 +1,20 @@
-import { Container, Heading, Text } from "@medusajs/ui"
-
-import { isStripeLike, paymentInfoMap } from "@lib/constants"
+import { isManual, paymentInfoMap } from "@lib/constants"
 import Divider from "@modules/common/components/divider"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
 
-type PaymentDetailsProps = {
-  order: HttpTypes.StoreOrder
-}
-
-const PaymentDetails = ({ order }: PaymentDetailsProps) => {
-  const payment = order.payment_collections?.[0].payments?.[0]
-
-  return (
-    <div>
-      <Heading level="h2" className="flex flex-row text-3xl-regular my-6">
-        Payment
-      </Heading>
-      <div>
-        {payment && (
-          <div className="flex items-start gap-x-1 w-full">
-            <div className="flex flex-col w-1/3">
-              <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                Payment method
-              </Text>
-              <Text
-                className="txt-medium text-ui-fg-subtle"
-                data-testid="payment-method"
-              >
-                {paymentInfoMap[payment.provider_id].title}
-              </Text>
-            </div>
-            <div className="flex flex-col w-2/3">
-              <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                Payment details
-              </Text>
-              <div className="flex gap-2 txt-medium text-ui-fg-subtle items-center">
-                <Container className="flex items-center h-7 w-fit p-2 bg-ui-button-neutral-hover">
-                  {paymentInfoMap[payment.provider_id].icon}
-                </Container>
-                <Text data-testid="payment-amount">
-                  {isStripeLike(payment.provider_id) && payment.data?.card_last4
-                    ? `**** **** **** ${payment.data.card_last4}`
-                    : `${convertToLocale({
-                        amount: payment.amount,
-                        currency_code: order.currency_code,
-                      })} paid at ${new Date(
-                        payment.created_at ?? ""
-                      ).toLocaleString()}`}
-                </Text>
-              </div>
-            </div>
-          </div>
-        )}
+export default function PaymentDetails({ order }: { order: HttpTypes.StoreOrder }) {
+  const payments = order.payment_collections?.flatMap(collection => collection.payments ?? []) ?? []
+  return <section>
+    <h2 className="font-serif text-3xl my-6">Payment</h2>
+    <div className="space-y-5">{payments.map(payment => <div key={payment.id} className="grid gap-4 small:grid-cols-2 text-sm leading-7">
+      <div><p className="font-medium">Payment method</p><p className="text-areve-walnut" data-testid="payment-method">{paymentInfoMap[payment.provider_id]?.title ?? "Payment"}</p></div>
+      <div><p className="font-medium">{isManual(payment.provider_id) ? "Review amount" : payment.captured_at ? "Payment received" : "Payment authorised"}</p>
+        <p data-testid="payment-amount">{convertToLocale({ amount: payment.amount, currency_code: order.currency_code })}</p>
+        <p className="text-areve-walnut">{isManual(payment.provider_id) ? "No money has been charged." : payment.captured_at || payment.created_at ? new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: "Africa/Lagos" }).format(new Date((payment.captured_at ?? payment.created_at)!)) + " · Lagos" : ""}</p>
       </div>
-
-      <Divider className="mt-8" />
-    </div>
-  )
+    </div>)}</div>
+    {!payments.length && <p className="text-sm text-areve-walnut">Payment status: {order.payment_status?.replaceAll("_", " ") ?? "awaiting confirmation"}.</p>}
+    <Divider className="mt-8" />
+  </section>
 }
-
-export default PaymentDetails
