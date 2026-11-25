@@ -2,6 +2,7 @@
 
 import { sdk } from "@lib/config"
 import { removeAuthToken } from "./cookies"
+import { redirect } from "next/navigation"
 
 export type RecoveryState = { success: boolean; message: string }
 
@@ -25,8 +26,10 @@ export async function resetCustomerPassword(_previous: RecoveryState, form: Form
   try {
     await sdk.auth.updateProvider("customer", "emailpass", { password }, token)
     await removeAuthToken()
-    return { success: true, message: "Your password has been updated. Sign in with your new password." }
   } catch {
     return { success: false, message: "This link has expired, was already used, or could not be verified. Request a new reset link." }
   }
+  // Finish recovery with an explicit navigation after clearing the old cookie.
+  // This also removes password fields and the consumed token from the page.
+  redirect("/ng/account?password=updated")
 }

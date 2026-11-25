@@ -64,9 +64,18 @@ async function waitForEmail(page: Page, email: string, subject: string) {
   return message
 }
 
-test("guest checkout persists a real order and private confirmation email", async ({ page }) => {
+test("guest checkout persists a real order and private confirmation email", async ({ page, browser, baseURL }) => {
   const email = `guest-${Date.now()}-${test.info().project.name}@areve.test`
   const confirmation = await order(page, email)
+  const cookie = (await page.context().cookies()).find(cookie => cookie.name.startsWith("_areve_receipt_"))
+  expect(cookie).toMatchObject({ httpOnly: true, sameSite: "Lax", secure: true, path: "/" })
+  const stranger = await browser.newContext({ baseURL })
+  try {
+    const other = await stranger.newPage()
+    await other.goto(confirmation)
+    await expect(other.getByTestId("order-complete-container")).toHaveCount(0)
+    await expect(other.locator("body")).not.toContainText(email)
+  } finally { await stranger.close() }
   const message = await waitForEmail(page, email, "is confirmed")
   await message.getByText("Preview email", { exact: true }).click()
   await expect(message.locator("iframe")).toBeVisible()
@@ -95,10 +104,15 @@ test("account checkout, real reset link, session revocation and fresh sign-in", 
     await page.getByLabel(/^New password/).fill(nextPassword)
     await page.getByLabel(/^Confirm password/).fill(nextPassword)
     await page.getByRole("button", { name: "Update password" }).click()
+    await expect(page).toHaveURL(/\/ng\/account\?password=updated$/)
     await expect(page.getByRole("status")).toContainText("updated")
     const stale = await old.newPage()
     await stale.goto("/ng/account")
     await expect(stale.getByTestId("login-page")).toBeVisible()
+    await stale.goto(confirmation)
+    await expect(stale.getByTestId("order-complete-container")).toHaveCount(0)
+    await stale.goto("/ng/products/review-quiet-vase")
+    await expect(stale.getByRole("heading", { name: "Quiet Form Vase" })).toBeVisible()
     await page.goto("/ng/account")
     await page.getByTestId("email-input").fill(email)
     await page.getByTestId("password-input").fill(nextPassword)

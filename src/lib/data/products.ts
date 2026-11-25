@@ -3,7 +3,7 @@
 import { sdk } from "@lib/config"
 import { cataloguePage } from "@lib/util/catalogue-query"
 import { HttpTypes } from "@medusajs/types"
-import { getAuthHeaders, getCacheOptions } from "./cookies"
+import { getCacheOptions } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
 
 export const listProducts = async ({
@@ -44,9 +44,8 @@ export const listProducts = async ({
     }
   }
 
-  const headers = {
-    ...(await getAuthHeaders()),
-  }
+  // Catalogue pricing is public for this MVP. A stale account session must not
+  // prevent browsing; protected customer and cart requests still authenticate.
 
   const next = {
     ...(await getCacheOptions("products")),
@@ -65,7 +64,6 @@ export const listProducts = async ({
             "*variants.calculated_price,+variants.inventory_quantity,*variants.images,+metadata,+tags,",
           ...queryParams,
         },
-        headers,
         next,
         cache: "force-cache",
       }

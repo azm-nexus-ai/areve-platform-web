@@ -98,3 +98,22 @@ export const removeCartId = async () => {
     sameSite: "lax",
   })
 }
+
+const receiptCookie = (id: string) => /^order_[a-zA-Z0-9]{1,80}$/.test(id) ? `_areve_receipt_${id}` : null
+
+export const getOrderReceipt = async (orderId: string) => {
+  const name = receiptCookie(orderId)
+  return name ? (await nextCookies()).get(name)?.value : undefined
+}
+
+/** Server-only proof from successful cart completion, never a URL credential
+ * or client storage value. Bound cookie growth on shared browsers.
+ */
+export const setOrderReceipt = async (orderId: string, receipt: string) => {
+  const name = receiptCookie(orderId)
+  if (!name || receipt.length > 1024) throw new Error("Unable to preserve your order receipt")
+  const cookies = await nextCookies()
+  const existing = cookies.getAll().filter(cookie => cookie.name.startsWith("_areve_receipt_") && cookie.name !== name)
+  for (const cookie of existing.slice(0, Math.max(0, existing.length - 9))) cookies.delete(cookie.name)
+  cookies.set(name, receipt, { maxAge: 30 * 24 * 60 * 60, httpOnly: true, sameSite: "lax", path: "/", secure: process.env.NODE_ENV === "production" })
+}

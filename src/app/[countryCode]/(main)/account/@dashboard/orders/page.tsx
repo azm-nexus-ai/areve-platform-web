@@ -3,8 +3,6 @@ import { Metadata } from "next"
 import OrderOverview from "@modules/account/components/order-overview"
 import { notFound } from "next/navigation"
 import { listOrders } from "@lib/data/orders"
-import Divider from "@modules/common/components/divider"
-import TransferRequestForm from "@modules/account/components/transfer-request-form"
 
 export const metadata: Metadata = {
   title: "Orders",
@@ -23,14 +21,12 @@ export default async function Orders() {
       <div className="mb-8 flex flex-col gap-y-4">
         <h1 className="text-2xl-semi">Orders</h1>
         <p className="text-base-regular">
-          View your previous orders and their status. You can also create
-          returns or exchanges for your orders if needed.
+          View orders placed while signed in and follow their status. For help with
+          a guest order, return or exchange, contact AREVÉ with your order number.
         </p>
       </div>
       <div>
         <OrderOverview orders={orders} />
-        <Divider className="my-16" />
-        <TransferRequestForm />
       </div>
     </div>
   )
