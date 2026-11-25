@@ -12,6 +12,7 @@ import {
   getCartId,
   removeCartId,
   setCartId,
+  setOrderReceipt,
 } from "./cookies"
 import { getRegion } from "./regions"
 import { getLocale } from "@lib/data/locale-actions"
@@ -423,8 +424,10 @@ export async function placeOrder(cartId?: string) {
     const orderCacheTag = await getCacheTag("orders")
     revalidateTag(orderCacheTag)
 
+    const receipt = (cartRes as typeof cartRes & { order_receipt?: string }).order_receipt
+    if (receipt) await setOrderReceipt(cartRes.order.id, receipt)
     await removeCartId()
-    redirect(`/${countryCode}/order/${cartRes?.order.id}/confirmed`)
+    redirect(`/${countryCode || "ng"}/order/${cartRes?.order.id}/confirmed`)
   }
 
   return cartRes.cart

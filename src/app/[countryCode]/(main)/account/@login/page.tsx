@@ -7,6 +7,6 @@ export const metadata: Metadata = {
   description: "Sign in to your AREVÉ account.",
 }
 
-export default function Login() {
-  return <LoginTemplate />
+export default async function Login({ searchParams }: { searchParams: Promise<{ password?: string }> }) {
+  return <LoginTemplate resetComplete={(await searchParams).password === "updated"} />
 }

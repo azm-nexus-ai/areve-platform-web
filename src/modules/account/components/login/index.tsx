@@ -8,9 +8,10 @@ import { useActionState } from "react"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
+  resetComplete?: boolean
 }
 
-const Login = ({ setCurrentView }: Props) => {
+const Login = ({ setCurrentView, resetComplete }: Props) => {
   const [message, formAction] = useActionState(login, null)
 
   return (
@@ -19,6 +20,7 @@ const Login = ({ setCurrentView }: Props) => {
       data-testid="login-page"
     >
       <h1 className="text-large-semi uppercase mb-6">Welcome back</h1>
+      {resetComplete && <p role="status" className="mb-6 border-l-2 border-areve-botanical bg-areve-sand/30 p-4 text-sm leading-6">Your password has been updated. Sign in with your new password.</p>}
       <p className="text-center text-base-regular text-ui-fg-base mb-8">
         Sign in to access an enhanced shopping experience.
       </p>
