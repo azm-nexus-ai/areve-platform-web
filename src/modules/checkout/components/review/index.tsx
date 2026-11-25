@@ -2,12 +2,10 @@
 
 import { Heading, clx } from "@medusajs/ui"
 import PaymentButton from "../payment-button"
-import { usePathname, useSearchParams } from "next/navigation"
-import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 
 const Review = ({ cart }: { cart: any }) => {
   const searchParams = useSearchParams()
-  const pathname = usePathname()
   const isOpen = searchParams.get("step") === "review"
   const paymentStatus = searchParams.get("payment")
   const paidByGiftcard = cart?.gift_cards?.length > 0 && cart?.total === 0
@@ -30,11 +28,8 @@ const Review = ({ cart }: { cart: any }) => {
         <div className="space-y-5">
           {paymentStatus && (
             <p role="alert" className="border border-semantic-border-subtle bg-semantic-surface-muted p-4 text-sm text-semantic-text-error">
-              {paymentStatus === "cancelled" || paymentStatus === "abandoned"
-                ? "Payment was cancelled. Your order has not been confirmed."
-                : "Payment has not been confirmed. Please retry or choose another payment method."}
-              {" "}
-              <Link href={`${pathname}?step=payment`} className="font-semibold underline underline-offset-4">Return to payment</Link>
+              Your order has not been confirmed in this browser. Check its status before paying again.
+              If money has left your account, keep your payment reference and contact AREVÉ for help.
             </p>
           )}
           <p className="text-sm leading-6 text-semantic-text-muted">

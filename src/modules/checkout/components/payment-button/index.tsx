@@ -1,9 +1,10 @@
 "use client"
 
 import { isManual, isPaystack } from "@lib/constants"
-import { placeOrder } from "@lib/data/cart"
+import { checkPaymentOrder, placeOrder } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
+import { useSearchParams } from "next/navigation"
 import React, { useState } from "react"
 import ErrorMessage from "../error-message"
 
@@ -61,9 +62,17 @@ const PaystackPaymentButton = ({
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const session = cart.payment_collection?.payment_sessions?.find(
-    (s) => s.status === "pending"
-  )
+  const searchParams = useSearchParams()
+  const [hasRequestedCheck, setHasRequestedCheck] = useState(false)
+  const session = cart.payment_collection?.payment_sessions?.find(s => isPaystack(s.provider_id))
+  const requiresCheck = hasRequestedCheck || searchParams.has("payment") || session?.status === "authorized" || session?.status === "captured"
+  const reference = typeof session?.data?.paystackTxRef === "string" ? session.data.paystackTxRef : null
+  const checkOrder = async () => {
+    setHasRequestedCheck(true); setSubmitting(true); setErrorMessage(null)
+    try { const result = await checkPaymentOrder(); setErrorMessage(result.message) }
+    catch { setErrorMessage("Order verification is temporarily unavailable. Keep your payment reference and check again before making another payment.") }
+    finally { setSubmitting(false) }
+  }
   const authorizationUrl = session?.data?.paystackTxAuthorizationUrl as
     | string
     | undefined
@@ -81,7 +90,7 @@ const PaystackPaymentButton = ({
       safeUrl = null
     }
     if (!safeUrl) {
-      setErrorMessage("Paystack payment is not available. Please return to payment and try again.")
+      setErrorMessage("This payment link is unavailable. Check your order status before starting another payment.")
       return
     }
     setSubmitting(true)
@@ -91,14 +100,16 @@ const PaystackPaymentButton = ({
   return (
     <>
       <Button
-        disabled={notReady}
+        disabled={notReady || submitting}
         isLoading={submitting}
-        onClick={handlePayment}
+        onClick={requiresCheck ? checkOrder : handlePayment}
         size="large"
         data-testid={dataTestId}
       >
-        Pay with Paystack
+        {requiresCheck ? "Check order status" : "Pay with Paystack"}
       </Button>
+      {requiresCheck && reference && <p className="mt-3 break-all text-xs leading-5 text-semantic-text-muted">Payment reference: <span className="select-all font-mono">{reference}</span></p>}
+      {!requiresCheck && <button type="button" onClick={checkOrder} disabled={submitting} className="mt-3 block min-h-11 text-sm underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4">Already paid? Check order status</button>}
       <ErrorMessage
         error={errorMessage}
         data-testid="paystack-payment-error-message"
