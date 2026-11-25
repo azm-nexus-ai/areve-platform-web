@@ -10,7 +10,6 @@ import ProductTabs from "@modules/products/components/product-tabs"
 import RelatedProducts from "@modules/products/components/related-products"
 import ProductInfo from "@modules/products/templates/product-info"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
-import ProductActionsWrapper from "./product-actions-wrapper"
 
 type Props = {
   product: HttpTypes.StoreProduct
@@ -31,9 +30,7 @@ export default async function ProductTemplate({ product, region, countryCode, im
         </div>
         <div className="flex min-w-0 flex-col gap-7">
           <ProductInfo product={product} />
-          <Suspense fallback={<ProductActions disabled product={product} region={region} />}>
-            <ProductActionsWrapper id={product.id} region={region} />
-          </Suspense>
+          <ProductActions key={product.id} product={product} region={region} />
           <div className="border-y border-semantic-border-subtle py-4">
             <DeliveryPromise />
           </div>

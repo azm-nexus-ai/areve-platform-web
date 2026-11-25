@@ -2,7 +2,7 @@
 
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react"
 import { XMark } from "@medusajs/icons"
-import { useState } from "react"
+import { useState, type KeyboardEvent } from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CountrySelect from "../country-select"
 import LanguageSelect from "../language-select"
@@ -17,6 +17,19 @@ type SideMenuProps = {
   categories: HttpTypes.StoreProductCategory[]
 }
 
+// Touch WebKit can skip links/buttons during native Tab navigation. Keep the
+// modal's keyboard sequence explicit while retaining Headless UI's other guards.
+function retainMenuFocus(event: KeyboardEvent<HTMLDivElement>) {
+  if (event.key !== "Tab" || event.altKey || event.ctrlKey || event.metaKey) return
+  const controls = Array.from(event.currentTarget.querySelectorAll<HTMLElement>('a[href],button,input,select,textarea,[tabindex]'))
+    .filter(element => element.tabIndex >= 0 && !element.matches(":disabled") && element.getClientRects().length > 0 && !element.closest('[inert],[aria-hidden="true"]'))
+  if (!controls.length) return
+  event.preventDefault()
+  const current = controls.indexOf(document.activeElement as HTMLElement)
+  const next = current < 0 ? (event.shiftKey ? controls.length - 1 : 0) : (current + (event.shiftKey ? -1 : 1) + controls.length) % controls.length
+  controls[next].focus()
+}
+
 export default function SideMenu({ regions, locales, currentLocale, categories }: SideMenuProps) {
   const [open, setOpen] = useState(false)
   const close = () => setOpen(false)
@@ -25,14 +38,14 @@ export default function SideMenu({ regions, locales, currentLocale, categories }
   return <>
     <button type="button" data-testid="nav-menu-button" onClick={() => setOpen(true)} aria-haspopup="dialog" aria-expanded={open}
       className="flex min-h-11 items-center text-xs font-medium uppercase tracking-[0.08em] hover:text-areve-walnut">Menu</button>
-    <Dialog open={open} onClose={close} className="fixed inset-0 z-[100]">
+    <Dialog open={open} onClose={close} onKeyDown={retainMenuFocus} className="fixed inset-0 z-[100]">
       <div className="fixed inset-0 bg-areve-ink/40" aria-hidden="true" data-testid="side-menu-backdrop" />
       <div className="fixed inset-0 flex">
         <DialogPanel className="flex h-full w-[min(90vw,420px)] flex-col bg-areve-ivory text-areve-ink shadow-xl">
           <DialogTitle className="sr-only">Explore AREVÉ</DialogTitle>
           <div className="flex items-center justify-between border-b border-areve-sand px-5 py-4">
             <BrandMark />
-            <button type="button" data-testid="close-menu-button" onClick={close} className="inline-flex min-h-11 min-w-11 items-center justify-center" aria-label="Close menu"><XMark /></button>
+            <button type="button" autoFocus data-autofocus data-testid="close-menu-button" onClick={close} className="inline-flex min-h-11 min-w-11 items-center justify-center" aria-label="Close menu"><XMark /></button>
           </div>
           <div className="flex flex-1 flex-col overflow-y-auto overscroll-contain px-5 py-6">
             <LocalizedClientLink href="/store" onClick={close} className="mb-4 flex min-h-11 items-center font-serif text-3xl hover:text-areve-walnut">Shop all</LocalizedClientLink>

@@ -1,3 +1,4 @@
+import { secureCookies } from "../../../local-review"
 import "server-only"
 import { cookies as nextCookies } from "next/headers"
 
@@ -56,7 +57,7 @@ export const setAuthToken = async (token: string) => {
     httpOnly: true,
     sameSite: "lax",
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    secure: secureCookies(),
   })
 }
 
@@ -66,7 +67,7 @@ export const removeAuthToken = async () => {
     maxAge: -1,
     path: "/",
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: secureCookies(),
     sameSite: "lax",
   })
 }
@@ -84,7 +85,7 @@ export const setCartId = async (cartId: string) => {
     // A top-level return from Paystack must include this cookie.
     sameSite: "lax",
     path: "/",
-    secure: process.env.NODE_ENV === "production",
+    secure: secureCookies(),
   })
 }
 
@@ -94,7 +95,7 @@ export const removeCartId = async () => {
     maxAge: -1,
     path: "/",
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: secureCookies(),
     sameSite: "lax",
   })
 }
@@ -115,5 +116,5 @@ export const setOrderReceipt = async (orderId: string, receipt: string) => {
   const cookies = await nextCookies()
   const existing = cookies.getAll().filter(cookie => cookie.name.startsWith("_areve_receipt_") && cookie.name !== name)
   for (const cookie of existing.slice(0, Math.max(0, existing.length - 9))) cookies.delete(cookie.name)
-  cookies.set(name, receipt, { maxAge: 30 * 24 * 60 * 60, httpOnly: true, sameSite: "lax", path: "/", secure: process.env.NODE_ENV === "production" })
+  cookies.set(name, receipt, { maxAge: 30 * 24 * 60 * 60, httpOnly: true, sameSite: "lax", path: "/", secure: secureCookies() })
 }

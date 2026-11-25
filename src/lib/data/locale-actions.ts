@@ -1,5 +1,6 @@
 "use server"
 
+import { secureCookies } from "../../../local-review"
 import { sdk } from "@lib/config"
 import { revalidateTag } from "next/cache"
 import { cookies as nextCookies } from "next/headers"
@@ -28,7 +29,7 @@ export const setLocaleCookie = async (locale: string) => {
     maxAge: 60 * 60 * 24 * 365, // 1 year
     httpOnly: false, // Allow client-side access
     sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
+    secure: secureCookies(),
   })
 }
 

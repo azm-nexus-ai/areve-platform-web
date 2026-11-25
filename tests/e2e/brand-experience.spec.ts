@@ -59,6 +59,10 @@ test("menu traps focus, locks scrolling, closes with Escape and navigates to the
     await page.keyboard.press("Tab")
     expect(await dialog.evaluate(element => element.contains(document.activeElement))).toBe(true)
   }
+  for (let index = 0; index < 22; index++) {
+    await page.keyboard.press("Shift+Tab")
+    expect(await dialog.evaluate(element => element.contains(document.activeElement))).toBe(true)
+  }
   const accessibility = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze()
   expect(accessibility.violations.map(v => ({ id: v.id, targets: v.nodes.map(n => n.target) }))).toEqual([])
   await page.keyboard.press("Escape")
@@ -99,6 +103,7 @@ test("variant selection retains price, focus and an accessible mobile dialog", a
   await expect(choices.first()).toHaveAttribute("aria-pressed", "true")
   await expect(page.getByTestId("add-product-button").first()).toBeEnabled()
   await expect(page).toHaveURL(/v_id=variant_/)
+  const firstVariant = new URL(page.url()).searchParams.get("v_id")
   if (info.project.name === "mobile") {
     await page.evaluate(() => scrollTo(0, document.body.scrollHeight))
     const trigger = page.getByTestId("mobile-actions-button")
@@ -117,4 +122,8 @@ test("variant selection retains price, focus and an accessible mobile dialog", a
     await expect(choices.last()).toHaveAttribute("aria-pressed", "true")
     await expect(choices.first()).toHaveAttribute("aria-pressed", "false")
   }
+  await expect.poll(() => new URL(page.url()).searchParams.get("v_id")).not.toBe(firstVariant)
+  await page.reload()
+  await expect(page.getByTestId("product-options").filter({ visible: true }).getByTestId("option-button").last()).toHaveAttribute("aria-pressed", "true")
+  await expect(page.getByTestId("add-product-button").first()).toBeEnabled()
 })

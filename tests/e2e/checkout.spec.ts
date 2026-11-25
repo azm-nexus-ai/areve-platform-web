@@ -65,10 +65,12 @@ test("cross-site payment return retains the real cart cookie", async ({ page, co
   const otherOrigin = `http://${otherHost}:8010`
   await page.route(`${otherOrigin}/**`, (route) => route.fulfill({ contentType: "text/html; charset=utf-8", body: `<a href="${origin}/ng/checkout/paystack/callback?reference=fixture_unpaid">Return to AREVÉ</a>` }))
   await page.goto(`${otherOrigin}/payment-fixture`)
-  const callback = page.waitForRequest((request) => request.url().includes("/checkout/paystack/callback"))
+  const callback = page.waitForResponse((response) => response.url().includes("/checkout/paystack/callback"))
   await page.getByRole("link", { name: "Return to AREVÉ" }).click()
-  const headers = await (await callback).allHeaders()
-  expect(headers.cookie).toContain(`_medusa_cart_id=${cart.value}`)
+  // Verify the server used the cookie; WebKit omits it from request inspection.
+  const returned = await callback
+  expect(returned.status()).toBe(303)
+  expect(returned.headers().location).toContain("payment=not_confirmed")
   await expect(page).toHaveURL(/\/ng\/checkout\?step=address/)
   expect((await context.cookies()).find((cookie) => cookie.name === "_medusa_cart_id")?.value).toBe(cart.value)
 })
