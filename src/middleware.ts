@@ -1,3 +1,4 @@
+import { secureCookies } from "../local-review"
 import { HttpTypes } from "@medusajs/types"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -57,7 +58,7 @@ export async function middleware(request: NextRequest) {
   const response = hasCountry ? NextResponse.next() : NextResponse.redirect(url, 307)
   if (!request.cookies.has("_medusa_cache_id")) {
     response.cookies.set("_medusa_cache_id", crypto.randomUUID(), {
-      maxAge: 86400, path: "/", httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production",
+      maxAge: 86400, path: "/", httpOnly: true, sameSite: "lax", secure: secureCookies(),
     })
   }
   return response

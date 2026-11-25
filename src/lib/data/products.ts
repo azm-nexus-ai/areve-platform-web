@@ -3,7 +3,6 @@
 import { sdk } from "@lib/config"
 import { cataloguePage } from "@lib/util/catalogue-query"
 import { HttpTypes } from "@medusajs/types"
-import { getCacheOptions } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
 
 export const listProducts = async ({
@@ -47,10 +46,6 @@ export const listProducts = async ({
   // Catalogue pricing is public for this MVP. A stale account session must not
   // prevent browsing; protected customer and cart requests still authenticate.
 
-  const next = {
-    ...(await getCacheOptions("products")),
-  }
-
   return sdk.client
     .fetch<{ products: HttpTypes.StoreProduct[]; count: number }>(
       `/store/products`,
@@ -64,8 +59,9 @@ export const listProducts = async ({
             "*variants.calculated_price,+variants.inventory_quantity,*variants.images,+metadata,+tags,",
           ...queryParams,
         },
-        next,
-        cache: "force-cache",
+        // Price and available stock change through checkout and staff writes.
+        // A per-browser tag has no invalidation path for those external writes.
+        cache: "no-store",
       }
     )
     .then(({ products, count }) => {

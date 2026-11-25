@@ -36,7 +36,7 @@ export default function GiftStudy() {
           <div className={styles.interior}>
             <div className={styles.tissue} />
             <div className={styles.note}>
-              <Image src="/brand/icon-charcoal.svg" alt="" width={28} height={30} />
+              <Image src="/brand/icon-charcoal.svg" alt="" width={28} height={30} loading="eager" />
               <span>For someone<br />worth remembering.</span>
               <span className={styles.noteRule} />
               <span className={styles.signature}>Culture, Refined.</span>
@@ -44,7 +44,7 @@ export default function GiftStudy() {
           </div>
           <div className={styles.lid} data-open={open}>
             <div className={styles.lidTop}>
-              <Image src={`/brand/wordmark-${selected.inverse ? "warm-ivory" : "charcoal"}.svg`} alt="" width={150} height={42} />
+              <Image src={`/brand/wordmark-${selected.inverse ? "warm-ivory" : "charcoal"}.svg`} alt="" width={150} height={42} loading="eager" />
             </div>
             <div className={`${styles.face} ${styles.lidFront}`} />
             <div className={`${styles.face} ${styles.lidBack}`} />

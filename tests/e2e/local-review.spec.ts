@@ -70,7 +70,7 @@ test("guest checkout persists a real order and private confirmation email", asyn
   const email = `guest-${Date.now()}-${test.info().project.name}@areve.test`
   const confirmation = await order(page, email)
   const cookie = (await page.context().cookies()).find(cookie => cookie.name.startsWith("_areve_receipt_"))
-  expect(cookie).toMatchObject({ httpOnly: true, sameSite: "Lax", secure: true, path: "/" })
+  expect(cookie).toMatchObject({ httpOnly: true, sameSite: "Lax", secure: false, path: "/" })
   const stranger = await browser.newContext({ baseURL })
   try {
     const other = await stranger.newPage()

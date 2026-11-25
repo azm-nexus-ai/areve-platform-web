@@ -36,7 +36,11 @@ export default function ProductActions({
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  const [options, setOptions] = useState<Record<string, string | undefined>>({})
+  const [options, setOptions] = useState<Record<string, string | undefined>>(() => {
+    const linked = product.variants?.find(variant => variant.id === searchParams.get("v_id"))
+    const initial = linked ?? (product.variants?.length === 1 ? product.variants[0] : undefined)
+    return initial ? optionsAsKeymap(initial.options) ?? {} : {}
+  })
   const [isAdding, setIsAdding] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
   const countryCode = useParams().countryCode as string
@@ -131,6 +135,7 @@ export default function ProductActions({
       await addToCart({ variantId: selectedVariant.id, quantity: 1, countryCode })
     } catch {
       setAddError("Could not add this item to your cart. Please try again.")
+      router.refresh()
     } finally {
       setIsAdding(false)
     }

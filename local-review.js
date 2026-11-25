@@ -13,4 +13,9 @@ function localReviewEnabled(env = process.env) {
   }
   return true
 }
-module.exports = { localReviewEnabled }
+// WebKit does not retain Secure cookies on loopback HTTP. This exception is
+// available only behind the complete isolated-review guard, never on a host.
+function secureCookies(env = process.env) {
+  return !localReviewEnabled(env) && env.NODE_ENV === "production"
+}
+module.exports = { localReviewEnabled, secureCookies }
