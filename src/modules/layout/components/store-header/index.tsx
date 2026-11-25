@@ -16,7 +16,7 @@ export default function StoreHeader({
   searchControl,
 }: StoreHeaderProps) {
   return (
-    <header className="border-b border-semantic-border-subtle bg-semantic-surface-canvas text-semantic-text-primary">
+    <div className="border-b border-semantic-border-subtle bg-semantic-surface-canvas text-semantic-text-primary">
       <nav
         aria-label="Store navigation"
         className="content-container grid min-h-20 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 small:min-h-24"
@@ -45,6 +45,6 @@ export default function StoreHeader({
           {cart}
         </div>
       </nav>
-    </header>
+    </div>
   )
 }

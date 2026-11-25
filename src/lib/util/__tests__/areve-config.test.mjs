@@ -9,6 +9,7 @@ test("uses the API settings and normalises the WhatsApp number", () => {
     free_delivery_threshold: 250000,
     whatsapp_number: "0801 234 5678",
     support_email: "care@example.com",
+    checkout_available: true,
   })
   assert.deepEqual(config, {
     currency_code: "ngn",
@@ -16,6 +17,7 @@ test("uses the API settings and normalises the WhatsApp number", () => {
     free_delivery_threshold: 250000,
     whatsapp_number: "2348012345678",
     support_email: "care@example.com",
+    checkout_available: true,
     content: AREVE_CONFIG_DEFAULTS.content,
   })
 })
@@ -94,3 +96,11 @@ for (const link of ["//outside.test/path", "/\\outside.test", "https://user:pass
     assert.equal(content.hero.image_url, null)
   })
 }
+
+
+test("fails closed for checkout when settings are unavailable and rejects unsafe support links", () => {
+  assert.equal(resolveAreveConfig({ support_email: "care@areve.cc?subject=unexpected" }).support_email, null)
+  assert.equal(resolveAreveConfig(null).checkout_available, false)
+  assert.equal(resolveAreveConfig({ checkout_available: "true" }).checkout_available, false)
+  assert.equal(resolveAreveConfig({ support_email: "care@areve.cc\r\nbcc:another@areve.cc" }).support_email, null)
+})

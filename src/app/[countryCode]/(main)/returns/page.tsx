@@ -1,4 +1,4 @@
 import type { Metadata } from "next"
-import PolicyPlaceholder from "@modules/common/components/policy-placeholder"
+import PolicyDocument from "@modules/common/components/policy-document"
 export const metadata: Metadata = { title: "Returns | AREVÉ" }
-export default function ReturnsPage() { return <PolicyPlaceholder title="Returns" subject="returns" /> }
+export default function PolicyPage() { return <PolicyDocument kind="returns" /> }
