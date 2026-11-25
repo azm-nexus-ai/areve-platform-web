@@ -11,16 +11,16 @@ type ShippingDetailsProps = {
 const ShippingDetails = ({ order }: ShippingDetailsProps) => {
   return (
     <div>
-      <Heading level="h2" className="flex flex-row text-3xl-regular my-6">
+      <Heading level="h2" className="font-serif text-3xl my-6">
         Delivery
       </Heading>
-      <div className="flex items-start gap-x-8">
+      <div className="grid gap-6 small:grid-cols-3">
         <div
-          className="flex flex-col w-1/3"
+          className="flex flex-col min-w-0 break-words"
           data-testid="shipping-address-summary"
         >
           <Text className="txt-medium-plus text-ui-fg-base mb-1">
-            Shipping Address
+            Delivery address
           </Text>
           <Text className="txt-medium text-ui-fg-subtle">
             {order.shipping_address?.first_name}{" "}
@@ -40,25 +40,25 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
         </div>
 
         <div
-          className="flex flex-col w-1/3 "
+          className="flex flex-col min-w-0 break-words"
           data-testid="shipping-contact-summary"
         >
           <Text className="txt-medium-plus text-ui-fg-base mb-1">Contact</Text>
           <Text className="txt-medium text-ui-fg-subtle">
             {order.shipping_address?.phone}
           </Text>
-          <Text className="txt-medium text-ui-fg-subtle">{order.email}</Text>
+          <Text className="txt-medium text-ui-fg-subtle break-all">{order.email}</Text>
         </div>
 
         <div
-          className="flex flex-col w-1/3"
+          className="flex flex-col min-w-0 break-words"
           data-testid="shipping-method-summary"
         >
           <Text className="txt-medium-plus text-ui-fg-base mb-1">Method</Text>
           <Text className="txt-medium text-ui-fg-subtle">
-            {(order as any).shipping_methods[0]?.name} (
+            {order.shipping_methods?.[0]?.name ?? "Delivery"} (
             {convertToLocale({
-              amount: order.shipping_methods?.[0].total ?? 0,
+              amount: order.shipping_methods?.[0]?.total ?? 0,
               currency_code: order.currency_code,
             })}
             )

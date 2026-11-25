@@ -1,6 +1,5 @@
 import { retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
-import PaymentWrapper from "@modules/checkout/components/payment-wrapper"
 import CheckoutProgress from "@modules/checkout/components/checkout-progress"
 import CheckoutForm from "@modules/checkout/templates/checkout-form"
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
@@ -29,9 +28,9 @@ export default async function Checkout({
       <h1 className="mb-6 font-serif text-4xl text-semantic-text-primary">Checkout</h1>
       <CheckoutProgress />
       <div className="grid grid-cols-1 gap-10 small:grid-cols-[minmax(0,1fr)_360px] small:gap-12">
-        <PaymentWrapper cart={cart}>
+        <div>
           <CheckoutForm cart={cart} customer={customer} />
-        </PaymentWrapper>
+        </div>
         <CheckoutSummary cart={cart} />
       </div>
     </main>

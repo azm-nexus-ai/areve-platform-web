@@ -10,6 +10,7 @@ const requiredEnvs = [
 ]
 
 function checkEnvVariables() {
+  require("./local-review").localReviewEnabled()
   const missingEnvs = requiredEnvs.filter(function (env) {
     return !process.env[env.key]
   })
