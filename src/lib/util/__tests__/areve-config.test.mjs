@@ -20,13 +20,13 @@ test("uses the API settings and normalises the WhatsApp number", () => {
   })
 })
 
-test("falls back to storefront env values when the API is down", () => {
+test("retains contact fallback but does not advertise delivery when the API is down", () => {
   const config = resolveAreveConfig(null, {
     NEXT_PUBLIC_WHATSAPP_NUMBER: "+2348099999999",
     NEXT_PUBLIC_FREE_DELIVERY_THRESHOLD: "350000",
   })
   assert.equal(config.whatsapp_number, "2348099999999")
-  assert.equal(config.free_delivery_threshold, 350000)
+  assert.equal(config.free_delivery_threshold, 0)
   assert.equal(config.currency_code, "ngn")
 })
 
@@ -40,8 +40,8 @@ test("prefers the API WhatsApp number, but uses env when the API one is invalid"
   assert.equal(resolveAreveConfig({ whatsapp_number: "123" }, env).whatsapp_number, "2348011111111")
 })
 
-test("ignores a missing or zero threshold from the API", () => {
-  assert.equal(resolveAreveConfig({ free_delivery_threshold: 0 }).free_delivery_threshold, 300000)
+test("honours a disabled delivery promotion from the API", () => {
+  assert.equal(resolveAreveConfig({ free_delivery_threshold: 0 }).free_delivery_threshold, 0)
 })
 
 test("works out how far a cart is from free delivery", () => {

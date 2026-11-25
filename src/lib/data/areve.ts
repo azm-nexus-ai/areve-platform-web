@@ -4,14 +4,14 @@ import { sdk } from "@lib/config"
 import { resolveAreveConfig, type AreveConfig } from "@lib/util/areve-config"
 
 /**
- * Shop settings from the API (GET /store/areve/config), cached for 10 minutes.
+ * Current shop settings from the API (GET /store/areve/config).
  * Always returns usable settings: if the API is down, storefront fallbacks are used.
  */
 export const getAreveConfig = async (): Promise<AreveConfig> => {
   const fromApi = await sdk.client
     .fetch<{ config: AreveConfig }>(`/store/areve/config`, {
       method: "GET",
-      next: { revalidate: 600, tags: ["areve-config"] },
+      cache: "no-store",
     })
     .then(({ config }) => config)
     .catch(() => null)

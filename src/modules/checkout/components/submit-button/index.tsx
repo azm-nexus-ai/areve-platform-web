@@ -8,10 +8,12 @@ export function SubmitButton({
   children,
   variant = "primary",
   className,
+  disabled = false,
   "data-testid": dataTestId,
 }: {
   children: React.ReactNode
   variant?: "primary" | "secondary" | "transparent" | "danger" | null
+  disabled?: boolean
   className?: string
   "data-testid"?: string
 }) {
@@ -23,6 +25,7 @@ export function SubmitButton({
       className={className}
       type="submit"
       isLoading={pending}
+      disabled={disabled || pending}
       variant={variant || "primary"}
       data-testid={dataTestId}
     >

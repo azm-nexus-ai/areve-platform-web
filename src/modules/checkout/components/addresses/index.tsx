@@ -13,13 +13,16 @@ import BillingAddress from "../billing_address"
 import ErrorMessage from "../error-message"
 import ShippingAddress from "../shipping-address"
 import { SubmitButton } from "../submit-button"
+import type { DeliveryCoverage } from "@lib/util/delivery-coverage"
 
 const Addresses = ({
   cart,
   customer,
+  coverage,
 }: {
   cart: HttpTypes.StoreCart | null
   customer: HttpTypes.StoreCustomer | null
+  coverage: DeliveryCoverage | null
 }) => {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -40,20 +43,20 @@ const Addresses = ({
   const [message, formAction] = useActionState(setAddresses, null)
 
   return (
-    <div className="bg-white">
+    <div>
       <div className="flex flex-row items-center justify-between mb-6">
         <Heading
           level="h2"
-          className="flex flex-row text-3xl-regular gap-x-2 items-baseline"
+          className="flex flex-row font-serif text-3xl gap-x-2 items-baseline"
         >
-          Shipping Address
+          Delivery address
           {!isOpen && <CheckCircleSolid />}
         </Heading>
         {!isOpen && cart?.shipping_address && (
           <Text>
             <button
               onClick={handleEdit}
-              className="text-blue-800 hover:text-blue-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+              className="text-areve-walnut hover:text-areve-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
               data-testid="edit-address-button"
             >
               Edit
@@ -69,6 +72,7 @@ const Addresses = ({
               checked={sameAsBilling}
               onChange={toggleSameAsBilling}
               cart={cart}
+              coverage={coverage}
             />
 
             {!sameAsBilling && (
@@ -83,7 +87,7 @@ const Addresses = ({
                 <BillingAddress cart={cart} />
               </div>
             )}
-            <SubmitButton className="mt-6" data-testid="submit-address-button">
+            <SubmitButton className="mt-6" data-testid="submit-address-button" disabled={!coverage}>
               Continue to delivery
             </SubmitButton>
             <ErrorMessage error={message} data-testid="address-error-message" />
@@ -94,9 +98,9 @@ const Addresses = ({
           <div className="text-small-regular">
             {cart && cart.shipping_address ? (
               <div className="flex items-start gap-x-8">
-                <div className="flex items-start gap-x-1 w-full">
+                <div className="grid gap-6 small:grid-cols-3 w-full">
                   <div
-                    className="flex flex-col w-1/3"
+                    className="flex flex-col min-w-0 break-words"
                     data-testid="shipping-address-summary"
                   >
                     <Text className="txt-medium-plus text-ui-fg-base mb-1">
@@ -120,7 +124,7 @@ const Addresses = ({
                   </div>
 
                   <div
-                    className="flex flex-col w-1/3 "
+                    className="flex flex-col min-w-0 break-words"
                     data-testid="shipping-contact-summary"
                   >
                     <Text className="txt-medium-plus text-ui-fg-base mb-1">
@@ -130,12 +134,12 @@ const Addresses = ({
                       {cart.shipping_address.phone}
                     </Text>
                     <Text className="txt-medium text-ui-fg-subtle">
-                      {cart.email}
+                      <span className="break-all">{cart.email}</span>
                     </Text>
                   </div>
 
                   <div
-                    className="flex flex-col w-1/3"
+                    className="flex flex-col min-w-0 break-words"
                     data-testid="billing-address-summary"
                   >
                     <Text className="txt-medium-plus text-ui-fg-base mb-1">

@@ -31,13 +31,15 @@ test("product → cart → gift message → address → flat-fee delivery", asyn
   await accessible("checkout address")
   const fields: Record<string, string> = {
     "shipping-first-name-input": "Ada", "shipping-last-name-input": "Fixture",
-    "shipping-address-input": "1 Test Street", "shipping-area-input": "Ikeja",
-    "shipping-city-input": "Lagos", "shipping-province-input": "Lagos",
+    "shipping-address-input": "1 Test Street",
+    "shipping-city-input": "Lagos",
     "shipping-postal-code-input": "100001", "shipping-email-input": "browser-fixture@areve.test",
     "shipping-phone-input": "08000000000",
   }
   for (const [id, value] of Object.entries(fields)) await page.getByTestId(id).fill(value)
   await page.getByTestId("shipping-country-select").selectOption("ng")
+  await page.getByTestId("shipping-province-input").selectOption("Lagos")
+  await page.getByTestId("shipping-area-input").selectOption("Ikeja")
   await page.getByTestId("submit-address-button").click()
   await expect(page).toHaveURL(/step=delivery/)
   const mainland = page.getByRole("radio").filter({ hasText: "Lagos Mainland" })
