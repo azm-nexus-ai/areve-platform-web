@@ -10,6 +10,7 @@ type Props = {
 
 /** Presentational: safe to render from client components, with config supplied by the caller. */
 export default function DeliveryPromiseMessage({ config, itemTotal = 0, className }: Props) {
+  if (!(config.free_delivery_threshold > 0)) return null
   const safeItemTotal = Math.max(0, Number(itemTotal) || 0)
   const remaining = amountToFreeDelivery(safeItemTotal, config)
   const formatAmount = (amount: number) =>
@@ -22,10 +23,10 @@ export default function DeliveryPromiseMessage({ config, itemTotal = 0, classNam
     })
 
   const message = remaining === 0 && safeItemTotal >= config.free_delivery_threshold
-    ? "Free Lagos delivery unlocked."
+    ? "Free delivery threshold reached for eligible Lagos areas."
     : safeItemTotal > 0
-      ? `${formatAmount(remaining)} away from free Lagos delivery.`
-      : `Free Lagos delivery over ${formatAmount(config.free_delivery_threshold)}.`
+      ? `${formatAmount(remaining)} away from free delivery in eligible Lagos areas.`
+      : `Free delivery in eligible Lagos areas from ${formatAmount(config.free_delivery_threshold)}.`
 
   return (
     <p

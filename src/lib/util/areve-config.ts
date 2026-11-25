@@ -20,7 +20,7 @@ export type AreveConfig = {
   content: StorefrontContent
 }
 
-/** Mirrors the backend's StorefrontContent defaults until its PR is deployed. */
+/** Neutral content used when shop settings are unavailable. */
 export const DEFAULT_STOREFRONT_CONTENT: StorefrontContent = {
   announcement: { enabled: false, text: "", link: null },
   hero: {
@@ -35,7 +35,7 @@ export const DEFAULT_STOREFRONT_CONTENT: StorefrontContent = {
 export const AREVE_CONFIG_DEFAULTS: AreveConfig = {
   currency_code: "ngn",
   country_code: "ng",
-  free_delivery_threshold: 300000,
+  free_delivery_threshold: 0,
   whatsapp_number: null,
   support_email: null,
   content: DEFAULT_STOREFRONT_CONTENT,
@@ -85,15 +85,10 @@ export function resolveStorefrontContent(input: ApiConfig["content"]): Storefron
   }
 }
 
-/** The API is the source of truth; env values only fill gaps. */
+/** Only the API may advertise an active delivery promotion. */
 export function resolveAreveConfig(fromApi: ApiConfig | null | undefined, env: Env = {}): AreveConfig {
-  const envThreshold = Number(env.NEXT_PUBLIC_FREE_DELIVERY_THRESHOLD)
   const apiThreshold = Number(fromApi?.free_delivery_threshold)
-  const threshold = Number.isFinite(apiThreshold) && apiThreshold > 0
-    ? apiThreshold
-    : Number.isFinite(envThreshold) && envThreshold > 0
-      ? envThreshold
-      : AREVE_CONFIG_DEFAULTS.free_delivery_threshold
+  const threshold = Number.isFinite(apiThreshold) && apiThreshold > 0 ? apiThreshold : 0
 
   return {
     currency_code: fromApi?.currency_code || AREVE_CONFIG_DEFAULTS.currency_code,

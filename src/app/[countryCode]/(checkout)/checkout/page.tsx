@@ -6,6 +6,7 @@ import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
 import { Metadata } from "next"
 import { redirect } from "next/navigation"
 import { checkoutStep } from "@lib/util/checkout-step"
+import { listCartShippingMethods } from "@lib/data/fulfillment"
 
 export const metadata: Metadata = { title: "Checkout | AREVÉ" }
 
@@ -17,7 +18,9 @@ export default async function Checkout({
 }) {
   const [{ countryCode }, query, cart] = await Promise.all([params, searchParams, retrieveCart()])
   if (!cart?.items?.length) redirect(`/${countryCode}/cart`)
-  const step = checkoutStep(cart, query.step)
+  const shippingMethods = await listCartShippingMethods(cart.id)
+  const deliveryValid = cart.shipping_methods?.length === 1 && shippingMethods?.some(option => option.id === cart.shipping_methods?.[0].shipping_option_id && (option.price_type !== "flat" || Number(option.amount) === Number(cart.shipping_methods[0].amount)))
+  const step = checkoutStep({ ...cart, shipping_methods: deliveryValid ? cart.shipping_methods : [] }, query.step)
   if (query.step !== step) {
     redirect(`/${countryCode}/checkout?step=${step}`)
   }
@@ -29,7 +32,7 @@ export default async function Checkout({
       <CheckoutProgress />
       <div className="grid grid-cols-1 gap-10 small:grid-cols-[minmax(0,1fr)_360px] small:gap-12">
         <div>
-          <CheckoutForm cart={cart} customer={customer} />
+          <CheckoutForm cart={cart} customer={customer} shippingMethods={shippingMethods} />
         </div>
         <CheckoutSummary cart={cart} />
       </div>

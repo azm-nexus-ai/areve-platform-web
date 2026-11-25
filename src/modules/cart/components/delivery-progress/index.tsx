@@ -5,6 +5,7 @@ type Props = { itemTotal: number; config: Pick<AreveConfig, "currency_code" | "f
 
 export default function DeliveryProgress({ itemTotal, config }: Props) {
   const threshold = config.free_delivery_threshold
+  if (!(threshold > 0)) return null
   const safeTotal = Math.max(0, Number(itemTotal) || 0)
   const remaining = amountToFreeDelivery(safeTotal, config)
   const percentage = Math.min(100, Math.max(0, Math.round((safeTotal / threshold) * 100)))
@@ -19,7 +20,7 @@ export default function DeliveryProgress({ itemTotal, config }: Props) {
   return (
     <section aria-label="Free Lagos delivery progress" className="border border-semantic-border-subtle bg-semantic-surface-muted/40 p-5">
       <p className="text-sm font-semibold text-semantic-text-primary">
-        {remaining === 0 ? "Free Lagos delivery unlocked." : `${formatted} away from free Lagos delivery.`}
+        {remaining === 0 ? "Free delivery threshold reached for eligible Lagos areas." : `${formatted} away from free delivery in eligible Lagos areas.`}
       </p>
       <div
         className="mt-3 h-2 w-full overflow-hidden rounded-full bg-semantic-border-subtle"
